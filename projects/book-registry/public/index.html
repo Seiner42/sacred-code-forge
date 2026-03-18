@@ -7,73 +7,88 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="container">
-      <section id="login-view" class="card">
-        <h1>Book Registry</h1>
-        <p class="muted">Вход по паролю для доступа к реестру прочитанных книг.</p>
-        <form id="login-form" class="stack">
-          <label>
-            <span>Пароль</span>
-            <input id="password" name="password" type="password" required autocomplete="current-password" />
-          </label>
-          <button type="submit">Войти</button>
-          <p id="login-error" class="error hidden"></p>
-        </form>
+    <main class="shell">
+      <section id="login-view" class="auth-shell">
+        <div class="auth-card card">
+          <div class="eyebrow">PRIVATE REGISTRY</div>
+          <h1>Book Registry</h1>
+          <p class="lede muted">Спокойный личный реестр прочитанных книг: без лишнего шума, с ровной структурой и быстрым доступом.</p>
+          <form id="login-form" class="stack auth-form">
+            <label>
+              <span>Пароль</span>
+              <input id="password" name="password" type="password" required autocomplete="current-password" />
+            </label>
+            <button type="submit">Войти</button>
+            <p id="login-error" class="error hidden"></p>
+          </form>
+        </div>
       </section>
 
-      <section id="app-view" class="hidden">
-        <header class="toolbar">
-          <div>
+      <section id="app-view" class="hidden container">
+        <header class="hero card">
+          <div class="hero-copy">
+            <div class="eyebrow">BOOK REGISTRY</div>
             <h1>Реестр прочитанных книг</h1>
-            <p class="muted">Минимальный MVP-контур.</p>
+            <p class="lede muted">Храни список прочитанного, оценки, даты и заметки в аккуратном личном контуре.</p>
           </div>
-          <button id="logout-button" class="secondary">Выйти</button>
+          <div class="hero-actions">
+            <button id="logout-button" class="secondary">Выйти</button>
+          </div>
         </header>
 
-        <section class="card">
-          <div class="form-header">
-            <h2 id="book-form-title">Добавить книгу</h2>
-            <button id="cancel-edit-button" type="button" class="secondary hidden">Отмена</button>
-          </div>
-          <form id="book-form" class="stack">
-            <label><span>Название</span><input name="title" required /></label>
-            <label><span>Автор</span><input name="author" required /></label>
-            <label><span>Оценка (1–10)</span><input name="rating" type="number" min="1" max="10" required /></label>
-            <label><span>Дата прочтения</span><input name="finishedAt" type="date" required /></label>
-            <label><span>Комментарий</span><textarea name="comment" rows="4"></textarea></label>
-            <button id="submit-button" type="submit">Сохранить запись</button>
-            <p id="book-error" class="error hidden"></p>
-          </form>
-        </section>
+        <div class="content-grid">
+          <section class="card form-card">
+            <div class="form-header">
+              <div>
+                <div class="section-kicker">ФОРМА</div>
+                <h2 id="book-form-title">Добавить книгу</h2>
+              </div>
+              <button id="cancel-edit-button" type="button" class="ghost hidden">Отмена</button>
+            </div>
 
-        <section class="card">
-          <div class="list-header">
-            <h2>Книги</h2>
-            <button id="refresh-button" class="secondary">Обновить</button>
-          </div>
+            <form id="book-form" class="stack">
+              <label><span>Название</span><input name="title" required /></label>
+              <label><span>Автор</span><input name="author" required /></label>
+              <label><span>Оценка (1–10)</span><input name="rating" type="number" min="1" max="10" required /></label>
+              <label><span>Дата прочтения</span><input name="finishedAt" type="date" required /></label>
+              <label><span>Комментарий</span><textarea name="comment" rows="5"></textarea></label>
+              <button id="submit-button" type="submit">Сохранить запись</button>
+              <p id="book-error" class="error hidden"></p>
+            </form>
+          </section>
 
-          <div class="pagination-toolbar">
-            <label class="page-size-control">
-              <span>На странице</span>
-              <select id="page-size-select">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
-            <p id="pagination-summary" class="muted">Показано 0 из 0</p>
-          </div>
+          <section class="card list-card">
+            <div class="list-header">
+              <div>
+                <div class="section-kicker">СПИСОК</div>
+                <h2>Книги</h2>
+              </div>
+              <button id="refresh-button" class="secondary">Обновить</button>
+            </div>
 
-          <div id="books-empty" class="muted">Записей пока нет.</div>
-          <div id="books-list" class="books-list"></div>
+            <div class="pagination-toolbar surface">
+              <label class="page-size-control">
+                <span>На странице</span>
+                <select id="page-size-select">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+              <p id="pagination-summary" class="muted">Показано 0 из 0</p>
+            </div>
 
-          <div id="pagination-controls" class="pagination-controls hidden">
-            <button id="prev-page-button" type="button" class="secondary">Назад</button>
-            <span id="page-indicator" class="muted">Страница 1 из 1</span>
-            <button id="next-page-button" type="button" class="secondary">Вперёд</button>
-          </div>
-        </section>
+            <div id="books-empty" class="empty-state muted">Записей пока нет.</div>
+            <div id="books-list" class="books-list"></div>
+
+            <div id="pagination-controls" class="pagination-controls hidden">
+              <button id="prev-page-button" type="button" class="secondary">Назад</button>
+              <span id="page-indicator" class="muted">Страница 1 из 1</span>
+              <button id="next-page-button" type="button" class="secondary">Вперёд</button>
+            </div>
+          </section>
+        </div>
       </section>
     </main>
 
