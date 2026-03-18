@@ -158,14 +158,11 @@ h3 {
 
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
   gap: 20px;
-  align-items: start;
 }
 
-.form-card,
-.list-card {
-  min-width: 0;
+.single-column {
+  grid-template-columns: 1fr;
 }
 
 .stack {
@@ -261,7 +258,8 @@ button.small {
 .pagination-toolbar,
 .pagination-controls,
 .book-actions,
-.page-size-control {
+.page-size-control,
+.list-header-actions {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -273,11 +271,24 @@ button.small {
   margin-bottom: 18px;
 }
 
+.list-header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .surface {
   background: var(--surface);
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 18px;
   padding: 14px 16px;
+}
+
+.form-panel {
+  margin-bottom: 16px;
+}
+
+.form-card {
+  padding: 18px;
 }
 
 .pagination-toolbar {
@@ -364,20 +375,6 @@ button.small {
   text-align: center;
 }
 
-@media (max-width: 980px) {
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-card {
-    order: 1;
-  }
-
-  .list-card {
-    order: 2;
-  }
-}
-
 @media (max-width: 640px) {
   .shell {
     padding: 14px 10px 28px;
@@ -394,7 +391,8 @@ button.small {
   .pagination-toolbar,
   .pagination-controls,
   .book-actions,
-  .page-size-control {
+  .page-size-control,
+  .list-header-actions {
     flex-direction: column;
     align-items: stretch;
   }
@@ -403,6 +401,7 @@ button.small {
   .hero-actions button,
   .form-header button,
   .list-header button,
+  .list-header-actions button,
   .pagination-controls button,
   .book-actions button,
   button {

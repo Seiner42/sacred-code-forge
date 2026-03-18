@@ -2,6 +2,8 @@ const loginView = document.getElementById('login-view');
 const appView = document.getElementById('app-view');
 const loginForm = document.getElementById('login-form');
 const bookForm = document.getElementById('book-form');
+const formPanel = document.getElementById('form-panel');
+const toggleFormButton = document.getElementById('toggle-form-button');
 const booksList = document.getElementById('books-list');
 const booksEmpty = document.getElementById('books-empty');
 const loginError = document.getElementById('login-error');
@@ -19,6 +21,7 @@ const prevPageButton = document.getElementById('prev-page-button');
 const nextPageButton = document.getElementById('next-page-button');
 
 let editingBookId = null;
+let isFormOpen = false;
 let currentPage = 1;
 let currentPageSize = Number(pageSizeSelect.value);
 let currentPagination = {
@@ -55,13 +58,31 @@ function updatePaginationUi() {
   paginationControls.classList.toggle('hidden', totalItems === 0);
 }
 
-function resetBookForm() {
+function openForm() {
+  isFormOpen = true;
+  formPanel.classList.remove('hidden');
+  toggleFormButton.textContent = editingBookId ? 'Форма открыта' : 'Скрыть форму';
+}
+
+function closeForm() {
+  isFormOpen = false;
+  formPanel.classList.add('hidden');
+  toggleFormButton.textContent = 'Добавить книгу';
+}
+
+function resetBookForm({ keepOpen = false } = {}) {
   editingBookId = null;
   bookForm.reset();
   bookFormTitle.textContent = 'Добавить книгу';
   submitButton.textContent = 'Сохранить запись';
-  cancelEditButton.classList.add('hidden');
+  cancelEditButton.textContent = 'Закрыть';
   setError(bookError, '');
+
+  if (keepOpen) {
+    openForm();
+  } else {
+    closeForm();
+  }
 }
 
 function startEditing(book) {
@@ -73,9 +94,10 @@ function startEditing(book) {
   bookForm.comment.value = book.comment || '';
   bookFormTitle.textContent = 'Изменить книгу';
   submitButton.textContent = 'Сохранить изменения';
-  cancelEditButton.classList.remove('hidden');
+  cancelEditButton.textContent = 'Отмена';
   setError(bookError, '');
-  bookForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  openForm();
+  formPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderBooks(books) {
@@ -227,6 +249,14 @@ bookForm.addEventListener('submit', async (event) => {
 
 cancelEditButton.addEventListener('click', () => {
   resetBookForm();
+});
+
+toggleFormButton.addEventListener('click', () => {
+  if (isFormOpen) {
+    resetBookForm();
+  } else {
+    resetBookForm({ keepOpen: true });
+  }
 });
 
 refreshButton.addEventListener('click', async () => {

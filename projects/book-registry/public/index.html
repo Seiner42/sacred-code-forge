@@ -36,35 +36,40 @@
           </div>
         </header>
 
-        <div class="content-grid">
-          <section class="card form-card">
-            <div class="form-header">
-              <div>
-                <div class="section-kicker">ФОРМА</div>
-                <h2 id="book-form-title">Добавить книгу</h2>
-              </div>
-              <button id="cancel-edit-button" type="button" class="ghost hidden">Отмена</button>
-            </div>
-
-            <form id="book-form" class="stack">
-              <label><span>Название</span><input name="title" required /></label>
-              <label><span>Автор</span><input name="author" required /></label>
-              <label><span>Оценка (1–10)</span><input name="rating" type="number" min="1" max="10" required /></label>
-              <label><span>Дата прочтения</span><input name="finishedAt" type="date" required /></label>
-              <label><span>Комментарий</span><textarea name="comment" rows="5"></textarea></label>
-              <button id="submit-button" type="submit">Сохранить запись</button>
-              <p id="book-error" class="error hidden"></p>
-            </form>
-          </section>
-
+        <div class="content-grid single-column">
           <section class="card list-card">
             <div class="list-header">
               <div>
                 <div class="section-kicker">СПИСОК</div>
                 <h2>Книги</h2>
               </div>
-              <button id="refresh-button" class="secondary">Обновить</button>
+              <div class="list-header-actions">
+                <button id="toggle-form-button" class="ghost">Добавить книгу</button>
+                <button id="refresh-button" class="secondary">Обновить</button>
+              </div>
             </div>
+
+            <section id="form-panel" class="form-panel hidden">
+              <div class="form-card surface">
+                <div class="form-header">
+                  <div>
+                    <div class="section-kicker">ФОРМА</div>
+                    <h2 id="book-form-title">Добавить книгу</h2>
+                  </div>
+                  <button id="cancel-edit-button" type="button" class="ghost">Закрыть</button>
+                </div>
+
+                <form id="book-form" class="stack">
+                  <label><span>Название</span><input name="title" required /></label>
+                  <label><span>Автор</span><input name="author" required /></label>
+                  <label><span>Оценка (1–10)</span><input name="rating" type="number" min="1" max="10" required /></label>
+                  <label><span>Дата прочтения</span><input name="finishedAt" type="date" required /></label>
+                  <label><span>Комментарий</span><textarea name="comment" rows="5"></textarea></label>
+                  <button id="submit-button" type="submit">Сохранить запись</button>
+                  <p id="book-error" class="error hidden"></p>
+                </form>
+              </div>
+            </section>
 
             <div class="pagination-toolbar surface">
               <label class="page-size-control">
