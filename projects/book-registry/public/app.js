@@ -8,6 +8,11 @@ const loginError = document.getElementById('login-error');
 const bookError = document.getElementById('book-error');
 const refreshButton = document.getElementById('refresh-button');
 const logoutButton = document.getElementById('logout-button');
+const submitButton = document.getElementById('submit-button');
+const cancelEditButton = document.getElementById('cancel-edit-button');
+const bookFormTitle = document.getElementById('book-form-title');
+
+let editingBookId = null;
 
 function showLogin() {
   loginView.classList.remove('hidden');
@@ -22,6 +27,29 @@ function showApp() {
 function setError(node, message) {
   node.textContent = message;
   node.classList.toggle('hidden', !message);
+}
+
+function resetBookForm() {
+  editingBookId = null;
+  bookForm.reset();
+  bookFormTitle.textContent = 'Добавить книгу';
+  submitButton.textContent = 'Сохранить запись';
+  cancelEditButton.classList.add('hidden');
+  setError(bookError, '');
+}
+
+function startEditing(book) {
+  editingBookId = book.id;
+  bookForm.title.value = book.title;
+  bookForm.author.value = book.author;
+  bookForm.rating.value = book.rating;
+  bookForm.finishedAt.value = book.finishedAt;
+  bookForm.comment.value = book.comment || '';
+  bookFormTitle.textContent = 'Изменить книгу';
+  submitButton.textContent = 'Сохранить изменения';
+  cancelEditButton.classList.remove('hidden');
+  setError(bookError, '');
+  bookForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderBooks(books) {
@@ -39,13 +67,39 @@ function renderBooks(books) {
         <span>Прочитано: ${escapeHtml(book.finishedAt)}</span>
       </div>
       <p>${escapeHtml(book.comment || '—')}</p>
+      <div class="book-actions">
+        <button type="button" class="secondary small" data-action="edit">Изменить</button>
+        <button type="button" class="danger small" data-action="delete">Удалить</button>
+      </div>
     `;
+
+    item.querySelector('[data-action="edit"]').addEventListener('click', () => {
+      startEditing(book);
+    });
+
+    item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+      const confirmed = window.confirm(`Удалить книгу «${book.title}»?`);
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await api(`/api/books/${book.id}`, { method: 'DELETE' });
+        if (editingBookId === book.id) {
+          resetBookForm();
+        }
+        await loadBooks();
+      } catch (error) {
+        setError(bookError, error.message);
+      }
+    });
+
     booksList.appendChild(item);
   });
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value)
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
@@ -105,15 +159,27 @@ bookForm.addEventListener('submit', async (event) => {
   payload.rating = Number(payload.rating);
 
   try {
-    await api('/api/books', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    bookForm.reset();
+    if (editingBookId) {
+      await api(`/api/books/${editingBookId}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+    } else {
+      await api('/api/books', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    }
+
+    resetBookForm();
     await loadBooks();
   } catch (error) {
     setError(bookError, error.message);
   }
+});
+
+cancelEditButton.addEventListener('click', () => {
+  resetBookForm();
 });
 
 refreshButton.addEventListener('click', async () => {
@@ -128,11 +194,13 @@ logoutButton.addEventListener('click', async () => {
   try {
     await api('/api/logout', { method: 'POST' });
   } finally {
+    resetBookForm();
     showLogin();
   }
 });
 
 (async function init() {
+  resetBookForm();
   try {
     await loadBooks();
     showApp();

@@ -38,6 +38,10 @@ label {
   gap: 8px;
 }
 
+label span {
+  color: #d1d5db;
+}
+
 input,
 textarea,
 button {
@@ -71,16 +75,42 @@ button.secondary {
   background: #374151;
 }
 
+button.danger {
+  background: #b91c1c;
+}
+
+button.small {
+  padding: 10px 14px;
+}
+
 button:hover {
   filter: brightness(1.08);
 }
 
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
 .toolbar,
-.list-header {
+.list-header,
+.form-header,
+.book-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+}
+
+.form-header {
+  margin-bottom: 16px;
 }
 
 .books-list {
@@ -97,12 +127,19 @@ button:hover {
   overflow-wrap: anywhere;
 }
 
+.book-item h3,
+h1,
+h2 {
+  margin-top: 0;
+}
+
 .book-item h3 {
-  margin: 0;
+  margin-bottom: 0;
 }
 
 .book-item p {
   margin: 10px 0 0;
+  line-height: 1.45;
 }
 
 .book-meta {
@@ -112,6 +149,18 @@ button:hover {
   color: #cbd5e1;
   font-size: 0.95rem;
   margin: 8px 0;
+}
+
+.book-actions {
+  margin-top: 14px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  border-top: 1px solid #1f2937;
+  padding-top: 12px;
+}
+
+.book-actions button {
+  width: auto;
 }
 
 .muted {
@@ -139,13 +188,17 @@ button:hover {
   }
 
   .toolbar,
-  .list-header {
+  .list-header,
+  .form-header,
+  .book-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
   .toolbar button,
   .list-header button,
+  .form-header button,
+  .book-actions button,
   button {
     width: 100%;
   }

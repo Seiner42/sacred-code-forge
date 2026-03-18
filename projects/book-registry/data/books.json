@@ -1,3 +1,12 @@
 {
-  "books": []
+  "books": [
+    {
+      "id": "4aaac5e0-c26a-4dbc-b731-1e1f262bacac",
+      "title": "Р",
+      "author": "Р",
+      "rating": 5,
+      "finishedAt": "2026-03-19",
+      "comment": "Иир"
+    }
+  ]
 }
