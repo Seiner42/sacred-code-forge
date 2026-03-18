@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const { readBooks, writeBooks } = require('../storage/books');
 const { validateBook } = require('../utils/validateBook');
 
+const ALLOWED_PAGE_SIZES = new Set([10, 25, 50, 100]);
+
 function normalizeBookPayload(payload, id) {
   return {
     id,
@@ -14,14 +16,40 @@ function normalizeBookPayload(payload, id) {
   };
 }
 
+function getPagination(query) {
+  const rawPage = Number.parseInt(query.page, 10);
+  const rawPageSize = Number.parseInt(query.pageSize, 10);
+
+  const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const pageSize = ALLOWED_PAGE_SIZES.has(rawPageSize) ? rawPageSize : 10;
+
+  return { page, pageSize };
+}
+
 function createBooksRouter() {
   const router = express.Router();
 
-  router.get('/', async (_req, res, next) => {
+  router.get('/', async (req, res, next) => {
     try {
       const books = await readBooks();
       books.sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)));
-      res.json({ books });
+
+      const { page, pageSize } = getPagination(req.query);
+      const totalItems = books.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+      const safePage = Math.min(page, totalPages);
+      const startIndex = (safePage - 1) * pageSize;
+      const pagedBooks = books.slice(startIndex, startIndex + pageSize);
+
+      res.json({
+        books: pagedBooks,
+        pagination: {
+          page: safePage,
+          pageSize,
+          totalItems,
+          totalPages,
+        },
+      });
     } catch (error) {
       next(error);
     }

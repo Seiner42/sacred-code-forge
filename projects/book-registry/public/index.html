@@ -51,8 +51,28 @@
             <h2>Книги</h2>
             <button id="refresh-button" class="secondary">Обновить</button>
           </div>
+
+          <div class="pagination-toolbar">
+            <label class="page-size-control">
+              <span>На странице</span>
+              <select id="page-size-select">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+            <p id="pagination-summary" class="muted">Показано 0 из 0</p>
+          </div>
+
           <div id="books-empty" class="muted">Записей пока нет.</div>
           <div id="books-list" class="books-list"></div>
+
+          <div id="pagination-controls" class="pagination-controls hidden">
+            <button id="prev-page-button" type="button" class="secondary">Назад</button>
+            <span id="page-indicator" class="muted">Страница 1 из 1</span>
+            <button id="next-page-button" type="button" class="secondary">Вперёд</button>
+          </div>
         </section>
       </section>
     </main>

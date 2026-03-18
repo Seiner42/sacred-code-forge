@@ -44,13 +44,15 @@ label span {
 
 input,
 textarea,
-button {
+button,
+select {
   font: inherit;
   border-radius: 10px;
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #4b5563;
@@ -94,7 +96,8 @@ button:disabled {
 
 button:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid #60a5fa;
   outline-offset: 2px;
 }
@@ -102,7 +105,9 @@ textarea:focus-visible {
 .toolbar,
 .list-header,
 .form-header,
-.book-actions {
+.book-actions,
+.pagination-toolbar,
+.pagination-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -111,6 +116,30 @@ textarea:focus-visible {
 
 .form-header {
   margin-bottom: 16px;
+}
+
+.pagination-toolbar {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+.page-size-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-size-control span {
+  white-space: nowrap;
+}
+
+.page-size-control select {
+  min-width: 92px;
+}
+
+.pagination-controls {
+  margin-top: 16px;
+  justify-content: center;
 }
 
 .books-list {
@@ -190,7 +219,10 @@ h2 {
   .toolbar,
   .list-header,
   .form-header,
-  .book-actions {
+  .book-actions,
+  .pagination-toolbar,
+  .pagination-controls,
+  .page-size-control {
     flex-direction: column;
     align-items: stretch;
   }
@@ -199,6 +231,7 @@ h2 {
   .list-header button,
   .form-header button,
   .book-actions button,
+  .pagination-controls button,
   button {
     width: 100%;
   }

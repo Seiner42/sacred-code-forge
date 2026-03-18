@@ -11,8 +11,22 @@ const logoutButton = document.getElementById('logout-button');
 const submitButton = document.getElementById('submit-button');
 const cancelEditButton = document.getElementById('cancel-edit-button');
 const bookFormTitle = document.getElementById('book-form-title');
+const pageSizeSelect = document.getElementById('page-size-select');
+const paginationSummary = document.getElementById('pagination-summary');
+const paginationControls = document.getElementById('pagination-controls');
+const pageIndicator = document.getElementById('page-indicator');
+const prevPageButton = document.getElementById('prev-page-button');
+const nextPageButton = document.getElementById('next-page-button');
 
 let editingBookId = null;
+let currentPage = 1;
+let currentPageSize = Number(pageSizeSelect.value);
+let currentPagination = {
+  page: 1,
+  pageSize: currentPageSize,
+  totalItems: 0,
+  totalPages: 1,
+};
 
 function showLogin() {
   loginView.classList.remove('hidden');
@@ -27,6 +41,18 @@ function showApp() {
 function setError(node, message) {
   node.textContent = message;
   node.classList.toggle('hidden', !message);
+}
+
+function updatePaginationUi() {
+  const { page, pageSize, totalItems, totalPages } = currentPagination;
+  const start = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = totalItems === 0 ? 0 : Math.min(page * pageSize, totalItems);
+
+  paginationSummary.textContent = `Показано ${start}–${end} из ${totalItems}`;
+  pageIndicator.textContent = `Страница ${page} из ${totalPages}`;
+  prevPageButton.disabled = page <= 1;
+  nextPageButton.disabled = page >= totalPages;
+  paginationControls.classList.toggle('hidden', totalItems === 0);
 }
 
 function resetBookForm() {
@@ -88,6 +114,11 @@ function renderBooks(books) {
         if (editingBookId === book.id) {
           resetBookForm();
         }
+
+        if (books.length === 1 && currentPage > 1) {
+          currentPage -= 1;
+        }
+
         await loadBooks();
       } catch (error) {
         setError(bookError, error.message);
@@ -129,8 +160,23 @@ async function api(path, options = {}) {
 }
 
 async function loadBooks() {
-  const data = await api('/api/books');
+  const params = new URLSearchParams({
+    page: String(currentPage),
+    pageSize: String(currentPageSize),
+  });
+
+  const data = await api(`/api/books?${params.toString()}`);
+  currentPagination = data.pagination || {
+    page: currentPage,
+    pageSize: currentPageSize,
+    totalItems: data.books?.length || 0,
+    totalPages: 1,
+  };
+  currentPage = currentPagination.page;
+  currentPageSize = currentPagination.pageSize;
+  pageSizeSelect.value = String(currentPageSize);
   renderBooks(data.books || []);
+  updatePaginationUi();
 }
 
 loginForm.addEventListener('submit', async (event) => {
@@ -172,6 +218,7 @@ bookForm.addEventListener('submit', async (event) => {
     }
 
     resetBookForm();
+    currentPage = 1;
     await loadBooks();
   } catch (error) {
     setError(bookError, error.message);
@@ -190,6 +237,42 @@ refreshButton.addEventListener('click', async () => {
   }
 });
 
+pageSizeSelect.addEventListener('change', async () => {
+  currentPageSize = Number(pageSizeSelect.value);
+  currentPage = 1;
+  try {
+    await loadBooks();
+  } catch (error) {
+    setError(bookError, error.message);
+  }
+});
+
+prevPageButton.addEventListener('click', async () => {
+  if (currentPage <= 1) {
+    return;
+  }
+
+  currentPage -= 1;
+  try {
+    await loadBooks();
+  } catch (error) {
+    setError(bookError, error.message);
+  }
+});
+
+nextPageButton.addEventListener('click', async () => {
+  if (currentPage >= currentPagination.totalPages) {
+    return;
+  }
+
+  currentPage += 1;
+  try {
+    await loadBooks();
+  } catch (error) {
+    setError(bookError, error.message);
+  }
+});
+
 logoutButton.addEventListener('click', async () => {
   try {
     await api('/api/logout', { method: 'POST' });
@@ -199,8 +282,12 @@ logoutButton.addEventListener('click', async () => {
   }
 });
 
-(async function init() {
+(function init() {
   resetBookForm();
+  updatePaginationUi();
+})();
+
+(async function bootstrap() {
   try {
     await loadBooks();
     showApp();
