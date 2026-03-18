@@ -283,6 +283,34 @@ button.small {
   padding: 14px 16px;
 }
 
+.stats-panel {
+  margin-bottom: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  min-width: 0;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
 .form-panel {
   margin-bottom: 16px;
 }
@@ -375,6 +403,12 @@ button.small {
   text-align: center;
 }
 
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
   .shell {
     padding: 14px 10px 28px;
@@ -406,6 +440,10 @@ button.small {
   .book-actions button,
   button {
     width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
   .pagination-controls span {

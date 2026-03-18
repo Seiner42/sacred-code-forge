@@ -26,13 +26,44 @@ function getPagination(query) {
   return { page, pageSize };
 }
 
+function sortBooks(books) {
+  return books.sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)));
+}
+
+function buildStats(books) {
+  const totalBooks = books.length;
+  const averageRating = totalBooks === 0
+    ? null
+    : Number((books.reduce((sum, book) => sum + Number(book.rating || 0), 0) / totalBooks).toFixed(1));
+
+  const sortedBooks = [...books].sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)));
+  const latestFinishedAt = sortedBooks[0]?.finishedAt || null;
+  const currentYear = new Date().getUTCFullYear();
+  const booksThisYear = books.filter((book) => String(book.finishedAt || '').startsWith(`${currentYear}-`)).length;
+
+  return {
+    totalBooks,
+    averageRating,
+    latestFinishedAt,
+    booksThisYear,
+  };
+}
+
 function createBooksRouter() {
   const router = express.Router();
 
-  router.get('/', async (req, res, next) => {
+  router.get('/stats', async (_req, res, next) => {
     try {
       const books = await readBooks();
-      books.sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)));
+      res.json({ stats: buildStats(books) });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/', async (req, res, next) => {
+    try {
+      const books = sortBooks(await readBooks());
 
       const { page, pageSize } = getPagination(req.query);
       const totalItems = books.length;

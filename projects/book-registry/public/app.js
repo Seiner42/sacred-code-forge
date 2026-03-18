@@ -19,6 +19,10 @@ const paginationControls = document.getElementById('pagination-controls');
 const pageIndicator = document.getElementById('page-indicator');
 const prevPageButton = document.getElementById('prev-page-button');
 const nextPageButton = document.getElementById('next-page-button');
+const statTotalBooks = document.getElementById('stat-total-books');
+const statAverageRating = document.getElementById('stat-average-rating');
+const statLatestFinished = document.getElementById('stat-latest-finished');
+const statBooksThisYear = document.getElementById('stat-books-this-year');
 
 let editingBookId = null;
 let isFormOpen = false;
@@ -56,6 +60,13 @@ function updatePaginationUi() {
   prevPageButton.disabled = page <= 1;
   nextPageButton.disabled = page >= totalPages;
   paginationControls.classList.toggle('hidden', totalItems === 0);
+}
+
+function renderStats(stats) {
+  statTotalBooks.textContent = stats.totalBooks ?? '—';
+  statAverageRating.textContent = stats.averageRating ?? '—';
+  statLatestFinished.textContent = stats.latestFinishedAt || '—';
+  statBooksThisYear.textContent = stats.booksThisYear ?? '—';
 }
 
 function openForm() {
@@ -141,7 +152,7 @@ function renderBooks(books) {
           currentPage -= 1;
         }
 
-        await loadBooks();
+        await refreshData();
       } catch (error) {
         setError(bookError, error.message);
       }
@@ -181,6 +192,11 @@ async function api(path, options = {}) {
   return data;
 }
 
+async function loadStats() {
+  const data = await api('/api/books/stats');
+  renderStats(data.stats || {});
+}
+
 async function loadBooks() {
   const params = new URLSearchParams({
     page: String(currentPage),
@@ -201,6 +217,10 @@ async function loadBooks() {
   updatePaginationUi();
 }
 
+async function refreshData() {
+  await Promise.all([loadStats(), loadBooks()]);
+}
+
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   setError(loginError, '');
@@ -213,7 +233,7 @@ loginForm.addEventListener('submit', async (event) => {
     });
     loginForm.reset();
     showApp();
-    await loadBooks();
+    await refreshData();
   } catch (error) {
     setError(loginError, error.message);
   }
@@ -241,7 +261,7 @@ bookForm.addEventListener('submit', async (event) => {
 
     resetBookForm();
     currentPage = 1;
-    await loadBooks();
+    await refreshData();
   } catch (error) {
     setError(bookError, error.message);
   }
@@ -261,7 +281,7 @@ toggleFormButton.addEventListener('click', () => {
 
 refreshButton.addEventListener('click', async () => {
   try {
-    await loadBooks();
+    await refreshData();
   } catch (error) {
     setError(bookError, error.message);
   }
@@ -315,11 +335,12 @@ logoutButton.addEventListener('click', async () => {
 (function init() {
   resetBookForm();
   updatePaginationUi();
+  renderStats({});
 })();
 
 (async function bootstrap() {
   try {
-    await loadBooks();
+    await refreshData();
     showApp();
   } catch {
     showLogin();
