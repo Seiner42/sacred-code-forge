@@ -253,27 +253,35 @@ button.small {
   padding: 10px 14px;
 }
 
+.section-header,
 .form-header,
-.list-header,
 .pagination-toolbar,
 .pagination-controls,
 .book-actions,
 .page-size-control,
-.list-header-actions {
+.list-header-actions,
+.control-actions,
+.control-grid {
   display: flex;
   gap: 12px;
   align-items: center;
 }
 
-.form-header,
-.list-header {
+.section-header,
+.form-header {
   justify-content: space-between;
   margin-bottom: 18px;
 }
 
+.control-grid {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.control-actions,
 .list-header-actions {
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .surface {
@@ -283,8 +291,13 @@ button.small {
   padding: 14px 16px;
 }
 
-.stats-panel {
-  margin-bottom: 16px;
+.compact-surface {
+  padding: 12px 14px;
+}
+
+.stats-panel,
+.form-panel {
+  margin: 0;
 }
 
 .stats-grid {
@@ -311,17 +324,12 @@ button.small {
   overflow-wrap: anywhere;
 }
 
-.form-panel {
-  margin-bottom: 16px;
-}
-
 .form-card {
-  padding: 18px;
+  padding: 24px;
 }
 
 .pagination-toolbar {
   justify-content: space-between;
-  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
@@ -414,28 +422,32 @@ button.small {
     padding: 14px 10px 28px;
   }
 
-  .card {
+  .card,
+  .form-card {
     border-radius: 20px;
     padding: 18px;
   }
 
   .hero,
+  .section-header,
   .form-header,
-  .list-header,
   .pagination-toolbar,
   .pagination-controls,
   .book-actions,
   .page-size-control,
-  .list-header-actions {
+  .list-header-actions,
+  .control-actions,
+  .control-grid {
     flex-direction: column;
     align-items: stretch;
   }
 
   .hero-actions,
   .hero-actions button,
+  .section-header button,
   .form-header button,
-  .list-header button,
   .list-header-actions button,
+  .control-actions button,
   .pagination-controls button,
   .book-actions button,
   button {
