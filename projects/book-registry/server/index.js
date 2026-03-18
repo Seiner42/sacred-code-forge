@@ -13,7 +13,7 @@ const port = Number(process.env.PORT || 3000);
 const cookieName = process.env.SESSION_COOKIE_NAME || 'book_registry_session';
 const sessionToken = process.env.SESSION_TOKEN || 'dev-session-token';
 const appPassword = process.env.APP_PASSWORD || '';
-const secureCookie = process.env.NODE_ENV === 'production';
+const secureCookie = process.env.COOKIE_SECURE === 'true';
 
 function requireSession(req, res, next) {
   if (req.cookies?.[cookieName] !== sessionToken) {
