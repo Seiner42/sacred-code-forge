@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Registry</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section id="login-view" class="card">
+        <h1>Book Registry</h1>
+        <p class="muted">Вход по паролю для доступа к реестру прочитанных книг.</p>
+        <form id="login-form" class="stack">
+          <label>
+            <span>Пароль</span>
+            <input id="password" name="password" type="password" required autocomplete="current-password" />
+          </label>
+          <button type="submit">Войти</button>
+          <p id="login-error" class="error hidden"></p>
+        </form>
+      </section>
+
+      <section id="app-view" class="hidden">
+        <header class="toolbar">
+          <div>
+            <h1>Реестр прочитанных книг</h1>
+            <p class="muted">Минимальный MVP-контур.</p>
+          </div>
+          <button id="logout-button" class="secondary">Выйти</button>
+        </header>
+
+        <section class="card">
+          <h2>Добавить книгу</h2>
+          <form id="book-form" class="stack">
+            <label><span>Название</span><input name="title" required /></label>
+            <label><span>Автор</span><input name="author" required /></label>
+            <label><span>Оценка (1–10)</span><input name="rating" type="number" min="1" max="10" required /></label>
+            <label><span>Дата прочтения</span><input name="finishedAt" type="date" required /></label>
+            <label><span>Комментарий</span><textarea name="comment" rows="4"></textarea></label>
+            <button type="submit">Сохранить запись</button>
+            <p id="book-error" class="error hidden"></p>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="list-header">
+            <h2>Книги</h2>
+            <button id="refresh-button" class="secondary">Обновить</button>
+          </div>
+          <div id="books-empty" class="muted">Записей пока нет.</div>
+          <div id="books-list" class="books-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

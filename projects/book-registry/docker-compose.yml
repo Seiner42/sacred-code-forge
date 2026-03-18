@@ -1,0 +1,11 @@
+services:
+  book-registry:
+    build: .
+    container_name: book-registry
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data/books.json:/app/data/books.json
+    restart: unless-stopped
