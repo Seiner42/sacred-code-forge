@@ -5,15 +5,20 @@
   color: #f3f4f6;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
 }
+
 .container {
   width: min(920px, calc(100% - 32px));
   margin: 32px auto;
 }
+
 .card {
   background: rgba(17, 24, 39, 0.92);
   border: 1px solid #374151;
@@ -22,19 +27,38 @@ body {
   margin-bottom: 20px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
 }
-.stack { display: grid; gap: 16px; }
-label { display: grid; gap: 8px; }
-input, textarea, button {
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+}
+
+input,
+textarea,
+button {
   font: inherit;
   border-radius: 10px;
 }
-input, textarea {
+
+input,
+textarea {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #4b5563;
   background: #0b1220;
   color: #f9fafb;
+  font-size: 16px;
 }
+
+textarea {
+  resize: vertical;
+}
+
 button {
   border: none;
   padding: 12px 16px;
@@ -42,25 +66,45 @@ button {
   color: white;
   cursor: pointer;
 }
-button.secondary { background: #374151; }
-button:hover { filter: brightness(1.08); }
-.toolbar, .list-header {
+
+button.secondary {
+  background: #374151;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+.toolbar,
+.list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
+
 .books-list {
   display: grid;
   gap: 12px;
   margin-top: 16px;
 }
+
 .book-item {
   border: 1px solid #374151;
   border-radius: 12px;
   padding: 16px;
   background: #0b1220;
+  overflow-wrap: anywhere;
 }
+
+.book-item h3 {
+  margin: 0;
+}
+
+.book-item p {
+  margin: 10px 0 0;
+}
+
 .book-meta {
   display: flex;
   gap: 12px;
@@ -69,6 +113,45 @@ button:hover { filter: brightness(1.08); }
   font-size: 0.95rem;
   margin: 8px 0;
 }
-.muted { color: #9ca3af; }
-.error { color: #fca5a5; }
-.hidden { display: none !important; }
+
+.muted {
+  color: #9ca3af;
+}
+
+.error {
+  color: #fca5a5;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: min(100%, calc(100% - 20px));
+    margin: 12px auto 20px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+
+  .toolbar,
+  .list-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar button,
+  .list-header button,
+  button {
+    width: 100%;
+  }
+
+  .book-meta {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
