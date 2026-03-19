@@ -1,12 +1,36 @@
 {
   "books": [
     {
-      "id": "4aaac5e0-c26a-4dbc-b731-1e1f262bacac",
-      "title": "Р",
-      "author": "Р",
-      "rating": 5,
-      "finishedAt": "2026-03-19",
-      "comment": "Иир"
+      "id": "4356b654-3a99-4dba-bdf6-2f6408ac11b2",
+      "title": "Американские Боги",
+      "author": "Нил Гейман",
+      "rating": 8,
+      "finishedAt": "2019-08-01",
+      "comment": "не помню"
+    },
+    {
+      "id": "cc8d1d9e-1909-479f-91ee-8c3322fb7fc3",
+      "title": "Ведьмак (весь)",
+      "author": "Анджей Сапковский",
+      "rating": 7,
+      "finishedAt": "2019-08-22",
+      "comment": "Очень хороша"
+    },
+    {
+      "id": "126a5185-ca3a-420c-920e-63e6146f38fb",
+      "title": "Шаровая Молния",
+      "author": "Лю Цысинь",
+      "rating": 7,
+      "finishedAt": "2019-10-30",
+      "comment": "Слабее трилогии о Земле, но годно"
+    },
+    {
+      "id": "4a73531e-f9d0-4328-8def-c05eada482c3",
+      "title": "Кровь и Железо",
+      "author": "Джо Аберкромби",
+      "rating": 8,
+      "finishedAt": "2019-11-27",
+      "comment": ""
     }
   ]
 }
