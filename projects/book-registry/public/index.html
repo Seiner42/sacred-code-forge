@@ -36,12 +36,13 @@
             </div>
           </div>
           <div class="topbar-actions">
+            <button id="toggle-stats-button" class="ghost">Показать статистику</button>
             <button id="logout-button" class="secondary">Выйти</button>
           </div>
         </header>
 
         <div class="content-grid single-column">
-          <section class="card stats-card-wrapper compact-card">
+          <section id="stats-section" class="card stats-card-wrapper compact-card hidden">
             <div class="section-header slim-header">
               <div>
                 <div class="section-kicker">СТАТИСТИКА</div>
@@ -67,6 +68,11 @@
                   <div class="stat-label">Книг в этом году</div>
                   <div id="stat-books-this-year" class="stat-value">—</div>
                 </article>
+              </div>
+
+              <div class="year-chart-card surface">
+                <div class="stat-label">Книги по годам</div>
+                <div id="books-by-year-chart" class="year-chart"></div>
               </div>
             </section>
           </section>

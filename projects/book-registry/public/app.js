@@ -3,6 +3,8 @@ const appView = document.getElementById('app-view');
 const loginForm = document.getElementById('login-form');
 const bookForm = document.getElementById('book-form');
 const formPanel = document.getElementById('form-panel');
+const statsSection = document.getElementById('stats-section');
+const toggleStatsButton = document.getElementById('toggle-stats-button');
 const toggleFormButton = document.getElementById('toggle-form-button');
 const booksList = document.getElementById('books-list');
 const booksEmpty = document.getElementById('books-empty');
@@ -23,12 +25,14 @@ const statTotalBooks = document.getElementById('stat-total-books');
 const statAverageRating = document.getElementById('stat-average-rating');
 const statLatestFinished = document.getElementById('stat-latest-finished');
 const statBooksThisYear = document.getElementById('stat-books-this-year');
+const booksByYearChart = document.getElementById('books-by-year-chart');
 const filterTitleInput = document.getElementById('filter-title');
 const filterAuthorInput = document.getElementById('filter-author');
 const clearFiltersButton = document.getElementById('clear-filters-button');
 
 let editingBookId = null;
 let isFormOpen = false;
+let isStatsOpen = false;
 let currentPage = 1;
 let currentPageSize = Number(pageSizeSelect.value);
 let currentFilters = {
@@ -69,11 +73,48 @@ function updatePaginationUi() {
   paginationControls.classList.toggle('hidden', totalItems === 0);
 }
 
+function renderYearChart(items = []) {
+  booksByYearChart.innerHTML = '';
+
+  if (!items.length) {
+    booksByYearChart.innerHTML = '<div class="muted">Пока недостаточно данных для графика.</div>';
+    return;
+  }
+
+  const maxCount = Math.max(...items.map((item) => item.count), 1);
+
+  items.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'year-chart-row';
+    row.innerHTML = `
+      <div class="year-chart-label">${item.year}</div>
+      <div class="year-chart-bar-wrap">
+        <div class="year-chart-bar" style="width: ${(item.count / maxCount) * 100}%"></div>
+      </div>
+      <div class="year-chart-value">${item.count}</div>
+    `;
+    booksByYearChart.appendChild(row);
+  });
+}
+
 function renderStats(stats) {
   statTotalBooks.textContent = stats.totalBooks ?? '—';
   statAverageRating.textContent = stats.averageRating ?? '—';
   statLatestFinished.textContent = stats.latestFinishedAt || '—';
   statBooksThisYear.textContent = stats.booksThisYear ?? '—';
+  renderYearChart(stats.booksByYear || []);
+}
+
+function openStats() {
+  isStatsOpen = true;
+  statsSection.classList.remove('hidden');
+  toggleStatsButton.textContent = 'Скрыть статистику';
+}
+
+function closeStats() {
+  isStatsOpen = false;
+  statsSection.classList.add('hidden');
+  toggleStatsButton.textContent = 'Показать статистику';
 }
 
 function openForm() {
@@ -226,13 +267,8 @@ async function loadBooks() {
     pageSize: String(currentPageSize),
   });
 
-  if (currentFilters.title) {
-    params.set('title', currentFilters.title);
-  }
-
-  if (currentFilters.author) {
-    params.set('author', currentFilters.author);
-  }
+  if (currentFilters.title) params.set('title', currentFilters.title);
+  if (currentFilters.author) params.set('author', currentFilters.author);
 
   const data = await api(`/api/books?${params.toString()}`);
   currentPagination = data.pagination || {
@@ -319,6 +355,14 @@ toggleFormButton.addEventListener('click', () => {
   }
 });
 
+toggleStatsButton.addEventListener('click', () => {
+  if (isStatsOpen) {
+    closeStats();
+  } else {
+    openStats();
+  }
+});
+
 refreshButton.addEventListener('click', async () => {
   try {
     await refreshData();
@@ -364,10 +408,7 @@ pageSizeSelect.addEventListener('change', async () => {
 });
 
 prevPageButton.addEventListener('click', async () => {
-  if (currentPage <= 1) {
-    return;
-  }
-
+  if (currentPage <= 1) return;
   currentPage -= 1;
   try {
     await loadBooks();
@@ -377,10 +418,7 @@ prevPageButton.addEventListener('click', async () => {
 });
 
 nextPageButton.addEventListener('click', async () => {
-  if (currentPage >= currentPagination.totalPages) {
-    return;
-  }
-
+  if (currentPage >= currentPagination.totalPages) return;
   currentPage += 1;
   try {
     await loadBooks();
@@ -394,12 +432,14 @@ logoutButton.addEventListener('click', async () => {
     await api('/api/logout', { method: 'POST' });
   } finally {
     resetBookForm();
+    closeStats();
     showLogin();
   }
 });
 
 (function init() {
   resetBookForm();
+  closeStats();
   updatePaginationUi();
   renderStats({});
 })();

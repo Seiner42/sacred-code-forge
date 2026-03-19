@@ -45,6 +45,20 @@ function filterBooks(books, query) {
   });
 }
 
+function buildBooksByYear(books) {
+  const counts = new Map();
+
+  for (const book of books) {
+    const year = String(book.finishedAt || '').slice(0, 4);
+    if (!/^\d{4}$/.test(year)) continue;
+    counts.set(year, (counts.get(year) || 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([year, count]) => ({ year, count }));
+}
+
 function buildStats(books) {
   const totalBooks = books.length;
   const averageRating = totalBooks === 0
@@ -55,12 +69,14 @@ function buildStats(books) {
   const latestFinishedAt = sortedBooks[0]?.finishedAt || null;
   const currentYear = new Date().getUTCFullYear();
   const booksThisYear = books.filter((book) => String(book.finishedAt || '').startsWith(`${currentYear}-`)).length;
+  const booksByYear = buildBooksByYear(books);
 
   return {
     totalBooks,
     averageRating,
     latestFinishedAt,
     booksThisYear,
+    booksByYear,
   };
 }
 
