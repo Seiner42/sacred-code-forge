@@ -116,19 +116,28 @@ function renderBooks(books) {
   booksEmpty.classList.toggle('hidden', books.length > 0);
 
   books.forEach((book) => {
+    const hasComment = Boolean(String(book.comment || '').trim());
     const item = document.createElement('article');
     item.className = 'book-item';
     item.innerHTML = `
-      <h3>${escapeHtml(book.title)}</h3>
-      <div class="book-meta">
-        <span>Автор: ${escapeHtml(book.author)}</span>
-        <span>Оценка: ${escapeHtml(String(book.rating))}/10</span>
-        <span>Прочитано: ${escapeHtml(book.finishedAt)}</span>
-      </div>
-      <p>${escapeHtml(book.comment || '—')}</p>
-      <div class="book-actions">
-        <button type="button" class="secondary small" data-action="edit">Изменить</button>
-        <button type="button" class="danger small" data-action="delete">Удалить</button>
+      <div class="book-layout ${hasComment ? '' : 'book-layout--compact'}">
+        <div class="book-content">
+          <div class="book-head">
+            <h3>${escapeHtml(book.title)}</h3>
+            <div class="book-author">${escapeHtml(book.author)}</div>
+          </div>
+          <div class="book-meta">
+            <span>Оценка: ${escapeHtml(String(book.rating))}/10</span>
+            <span>Прочитано: ${escapeHtml(book.finishedAt)}</span>
+          </div>
+          ${hasComment ? `<p class="book-comment">${escapeHtml(book.comment)}</p>` : ''}
+        </div>
+        <div class="book-side">
+          <div class="book-actions">
+            <button type="button" class="secondary small" data-action="edit">Изменить</button>
+            <button type="button" class="danger small" data-action="delete">Удалить</button>
+          </div>
+        </div>
       </div>
     `;
 
