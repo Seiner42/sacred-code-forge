@@ -31,6 +31,286 @@
       "rating": 8,
       "finishedAt": "2019-11-27",
       "comment": ""
+    },
+    {
+      "id": "838e6a57-155a-4916-89a6-64743f2452fb",
+      "title": "Прежде чем их повесят",
+      "author": "Джо Аберкромби",
+      "rating": 8,
+      "finishedAt": "2019-12-05",
+      "comment": ""
+    },
+    {
+      "id": "6b24992c-70e0-49a0-97d8-8ab7d4d5cb0f",
+      "title": "Последний довод королей",
+      "author": "Джо Аберкромби",
+      "rating": 6,
+      "finishedAt": "2019-12-09",
+      "comment": ""
+    },
+    {
+      "id": "07ba3269-9173-4116-930a-6285e5af118b",
+      "title": "Лучше подавать холодным",
+      "author": "Джо Аберкромби",
+      "rating": 7,
+      "finishedAt": "2019-12-17",
+      "comment": ""
+    },
+    {
+      "id": "08c55917-077d-4c3f-a68d-ea1a29a24fb1",
+      "title": "Герои",
+      "author": "Джо Аберкромби",
+      "rating": 7,
+      "finishedAt": "2019-12-20",
+      "comment": ""
+    },
+    {
+      "id": "1f58cfb2-93b3-4031-a781-09513059f97e",
+      "title": "Черный отряд",
+      "author": "Глен Кук",
+      "rating": 5,
+      "finishedAt": "2020-02-21",
+      "comment": ""
+    },
+    {
+      "id": "59c9c618-3a24-4894-93db-a079e02c0beb",
+      "title": "Зов кукушки",
+      "author": "Роберт Гэлбрейт",
+      "rating": 5,
+      "finishedAt": "2020-03-03",
+      "comment": ""
+    },
+    {
+      "id": "801c2ca3-f5a0-46aa-9a05-e447293cf9fa",
+      "title": "Пепел и Сталь",
+      "author": "Брендон Сандерсон",
+      "rating": 7,
+      "finishedAt": "2020-08-16",
+      "comment": ""
+    },
+    {
+      "id": "c7e3e915-aae8-41bc-9f86-53c91c4984df",
+      "title": "Видоизмененный углерод",
+      "author": "Ричард Морган",
+      "rating": 6,
+      "finishedAt": "2021-01-13",
+      "comment": ""
+    },
+    {
+      "id": "eae860cf-48af-4dc2-ab92-4c6f5809bae5",
+      "title": "Замок теней",
+      "author": "Глен Кук",
+      "rating": 7,
+      "finishedAt": "2021-02-15",
+      "comment": ""
+    },
+    {
+      "id": "d0faee17-ae41-4c08-9a2b-ff3461c648b5",
+      "title": "Белая роза",
+      "author": "Глен Кук",
+      "rating": 6,
+      "finishedAt": "2021-02-19",
+      "comment": ""
+    },
+    {
+      "id": "1e0c327b-d2f6-45b6-a386-d77e4d966cbd",
+      "title": "Ночной дозор",
+      "author": "Сергей Лукьяненко",
+      "rating": 6,
+      "finishedAt": "2021-03-27",
+      "comment": ""
+    },
+    {
+      "id": "a0384e68-f1de-4744-a51a-548e238a5048",
+      "title": "Игра теней",
+      "author": "Глен Кук",
+      "rating": 8,
+      "finishedAt": "2021-05-30",
+      "comment": ""
+    },
+    {
+      "id": "2947132f-1514-4810-b4d1-045d3a7bb261",
+      "title": "История древнего мира",
+      "author": "Сьюзен Уайс Бауэр",
+      "rating": 6,
+      "finishedAt": "2021-07-20",
+      "comment": ""
+    },
+    {
+      "id": "d3067b79-07f9-4907-b528-1759a9e9e1f5",
+      "title": "Задача трёх тел",
+      "author": "Лю Цысинь",
+      "rating": 8,
+      "finishedAt": "2021-08-16",
+      "comment": ""
+    },
+    {
+      "id": "affed5dc-db36-4906-8d4c-407b8fc9d30f",
+      "title": "Темный лес",
+      "author": "Лю Цысинь",
+      "rating": 7,
+      "finishedAt": "2021-08-31",
+      "comment": ""
+    },
+    {
+      "id": "4229e5f6-ad49-41bf-b6b7-a3596b6a572f",
+      "title": "Пробуждение леваифана",
+      "author": "Джеймс Кори",
+      "rating": 6,
+      "finishedAt": "2021-11-18",
+      "comment": ""
+    },
+    {
+      "id": "417010da-0d76-4355-9b35-2606ad34a05f",
+      "title": "Кровь и железо",
+      "author": "Джо Аберкромби",
+      "rating": 8,
+      "finishedAt": "2021-12-20",
+      "comment": ""
+    },
+    {
+      "id": "008099a9-e5bf-428f-80e5-84c0af436df8",
+      "title": "Прежде чем их повесят",
+      "author": "Джо Аберкромби",
+      "rating": 8,
+      "finishedAt": "2022-01-02",
+      "comment": ""
+    },
+    {
+      "id": "1fa4ac58-bc1c-4d98-ba78-a1b89f6b8adb",
+      "title": "Последний довод королей",
+      "author": "Джо Аберкромби",
+      "rating": 7,
+      "finishedAt": "2022-01-04",
+      "comment": ""
+    },
+    {
+      "id": "027c570b-2040-4cc1-91f5-287325464645",
+      "title": "Лучше подавать холодным",
+      "author": "Джо Аберкромби",
+      "rating": 6,
+      "finishedAt": "2022-01-14",
+      "comment": ""
+    },
+    {
+      "id": "59a7d339-dd5e-47ea-a7ee-87e1d8babd9a",
+      "title": "Герои",
+      "author": "Джо Аберкромби",
+      "rating": 7,
+      "finishedAt": "2022-01-27",
+      "comment": ""
+    },
+    {
+      "id": "6c0670fb-87fd-4812-8a90-b9b679285948",
+      "title": "Красная страна",
+      "author": "Джо Аберкромби",
+      "rating": 6,
+      "finishedAt": "2022-02-01",
+      "comment": ""
+    },
+    {
+      "id": "ccd3fc9d-8c77-4e2d-9714-793e1bfd8482",
+      "title": "Острые края",
+      "author": "Джо Аберкромби",
+      "rating": 4,
+      "finishedAt": "2022-02-15",
+      "comment": ""
+    },
+    {
+      "id": "e5f38807-be6f-4b38-a575-625273d13c60",
+      "title": "Немного ненависти",
+      "author": "Джо Аберкромби",
+      "rating": 6,
+      "finishedAt": "2022-02-20",
+      "comment": ""
+    },
+    {
+      "id": "f463bcbc-7da7-4e34-ad34-5d0b50866377",
+      "title": "Цвет волшебства",
+      "author": "Терри Пратчетт",
+      "rating": 7,
+      "finishedAt": "2022-04-30",
+      "comment": ""
+    },
+    {
+      "id": "c6abdf67-bc11-4cce-bdae-a07088a90fa8",
+      "title": "Безумная звезда",
+      "author": "Терри Пратчетт",
+      "rating": 8,
+      "finishedAt": "2022-05-02",
+      "comment": ""
+    },
+    {
+      "id": "13635c70-e7a7-4365-84ce-9579dedaa560",
+      "title": "Творцы заклинаний",
+      "author": "Терри Пратчетт",
+      "rating": 5,
+      "finishedAt": "2022-05-03",
+      "comment": ""
+    },
+    {
+      "id": "747a0dcb-d29c-4b05-b59a-4a3541d5e3dd",
+      "title": "Мор, ученик смерти",
+      "author": "Терри Пратчетт",
+      "rating": 7,
+      "finishedAt": "2022-05-06",
+      "comment": ""
+    },
+    {
+      "id": "ddd33c44-a644-4358-bf06-4e2586f78eb6",
+      "title": "Алмазный трон",
+      "author": "Дэвид Эддингс",
+      "rating": 7,
+      "finishedAt": "2022-09-26",
+      "comment": ""
+    },
+    {
+      "id": "9157ea81-14ff-42d2-938f-e81f17870921",
+      "title": "Рубиновый Рыцарь",
+      "author": "Дэвид Эддингс",
+      "rating": 6,
+      "finishedAt": "2022-10-01",
+      "comment": ""
+    },
+    {
+      "id": "38da41a8-cf34-4532-9a1d-45f46eeb7471",
+      "title": "Сапфировая роза",
+      "author": "Дэвид Эддингс",
+      "rating": 6,
+      "finishedAt": "2022-10-12",
+      "comment": ""
+    },
+    {
+      "id": "f3bb9dd6-3c4f-4120-9fdf-666f9b96f253",
+      "title": "Клинки Императора",
+      "author": "Брайан Стейвли",
+      "rating": 7,
+      "finishedAt": "2023-01-03",
+      "comment": ""
+    },
+    {
+      "id": "115045c3-0530-4e0c-9fbc-4922bc29a7bc",
+      "title": "Король Зимы",
+      "author": "Бернард Корнуэл",
+      "rating": 8,
+      "finishedAt": "2023-03-13",
+      "comment": ""
+    },
+    {
+      "id": "0c391900-9afe-4352-9ac4-3de2e083f9fb",
+      "title": "Враг божий",
+      "author": "Бернард Корнуэл",
+      "rating": 8,
+      "finishedAt": "2023-03-26",
+      "comment": ""
+    },
+    {
+      "id": "49aa4f7d-9cb0-44dd-857e-4a5a12ff5150",
+      "title": "Экскалибур",
+      "author": "Бернард Корнуэл",
+      "rating": 6,
+      "finishedAt": "2023-04-05",
+      "comment": ""
     }
   ]
 }
