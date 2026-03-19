@@ -23,11 +23,18 @@ const statTotalBooks = document.getElementById('stat-total-books');
 const statAverageRating = document.getElementById('stat-average-rating');
 const statLatestFinished = document.getElementById('stat-latest-finished');
 const statBooksThisYear = document.getElementById('stat-books-this-year');
+const filterTitleInput = document.getElementById('filter-title');
+const filterAuthorInput = document.getElementById('filter-author');
+const clearFiltersButton = document.getElementById('clear-filters-button');
 
 let editingBookId = null;
 let isFormOpen = false;
 let currentPage = 1;
 let currentPageSize = Number(pageSizeSelect.value);
+let currentFilters = {
+  title: '',
+  author: '',
+};
 let currentPagination = {
   page: 1,
   pageSize: currentPageSize,
@@ -219,6 +226,14 @@ async function loadBooks() {
     pageSize: String(currentPageSize),
   });
 
+  if (currentFilters.title) {
+    params.set('title', currentFilters.title);
+  }
+
+  if (currentFilters.author) {
+    params.set('author', currentFilters.author);
+  }
+
   const data = await api(`/api/books?${params.toString()}`);
   currentPagination = data.pagination || {
     page: currentPage,
@@ -229,12 +244,21 @@ async function loadBooks() {
   currentPage = currentPagination.page;
   currentPageSize = currentPagination.pageSize;
   pageSizeSelect.value = String(currentPageSize);
+  filterTitleInput.value = data.filters?.title ?? currentFilters.title;
+  filterAuthorInput.value = data.filters?.author ?? currentFilters.author;
   renderBooks(data.books || []);
   updatePaginationUi();
 }
 
 async function refreshData() {
   await Promise.all([loadStats(), loadBooks()]);
+}
+
+async function applyFilters() {
+  currentFilters.title = filterTitleInput.value.trim();
+  currentFilters.author = filterAuthorInput.value.trim();
+  currentPage = 1;
+  await loadBooks();
 }
 
 loginForm.addEventListener('submit', async (event) => {
@@ -298,6 +322,32 @@ toggleFormButton.addEventListener('click', () => {
 refreshButton.addEventListener('click', async () => {
   try {
     await refreshData();
+  } catch (error) {
+    setError(bookError, error.message);
+  }
+});
+
+filterTitleInput.addEventListener('input', async () => {
+  try {
+    await applyFilters();
+  } catch (error) {
+    setError(bookError, error.message);
+  }
+});
+
+filterAuthorInput.addEventListener('input', async () => {
+  try {
+    await applyFilters();
+  } catch (error) {
+    setError(bookError, error.message);
+  }
+});
+
+clearFiltersButton.addEventListener('click', async () => {
+  filterTitleInput.value = '';
+  filterAuthorInput.value = '';
+  try {
+    await applyFilters();
   } catch (error) {
     setError(bookError, error.message);
   }

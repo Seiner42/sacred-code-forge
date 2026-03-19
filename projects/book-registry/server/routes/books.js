@@ -30,6 +30,21 @@ function sortBooks(books) {
   return books.sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)));
 }
 
+function normalizeSearchValue(value) {
+  return String(value || '').trim().toLocaleLowerCase('ru-RU');
+}
+
+function filterBooks(books, query) {
+  const titleQuery = normalizeSearchValue(query.title);
+  const authorQuery = normalizeSearchValue(query.author);
+
+  return books.filter((book) => {
+    const titleMatches = !titleQuery || String(book.title || '').toLocaleLowerCase('ru-RU').includes(titleQuery);
+    const authorMatches = !authorQuery || String(book.author || '').toLocaleLowerCase('ru-RU').includes(authorQuery);
+    return titleMatches && authorMatches;
+  });
+}
+
 function buildStats(books) {
   const totalBooks = books.length;
   const averageRating = totalBooks === 0
@@ -63,14 +78,15 @@ function createBooksRouter() {
 
   router.get('/', async (req, res, next) => {
     try {
-      const books = sortBooks(await readBooks());
+      const allBooks = await readBooks();
+      const filteredBooks = sortBooks(filterBooks(allBooks, req.query));
 
       const { page, pageSize } = getPagination(req.query);
-      const totalItems = books.length;
+      const totalItems = filteredBooks.length;
       const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
       const safePage = Math.min(page, totalPages);
       const startIndex = (safePage - 1) * pageSize;
-      const pagedBooks = books.slice(startIndex, startIndex + pageSize);
+      const pagedBooks = filteredBooks.slice(startIndex, startIndex + pageSize);
 
       res.json({
         books: pagedBooks,
@@ -79,6 +95,10 @@ function createBooksRouter() {
           pageSize,
           totalItems,
           totalPages,
+        },
+        filters: {
+          title: String(req.query.title || ''),
+          author: String(req.query.author || ''),
         },
       });
     } catch (error) {
