@@ -41,21 +41,6 @@
         </header>
 
         <div class="content-grid single-column">
-          <section class="card control-card priority-card">
-            <div class="section-header">
-              <div>
-                <div class="section-kicker">УПРАВЛЕНИЕ</div>
-                <h2>Статус и управление</h2>
-              </div>
-            </div>
-
-            <div class="control-grid">
-              <div class="control-actions">
-                <button id="toggle-form-button" class="ghost">Добавить книгу</button>
-              </div>
-            </div>
-          </section>
-
           <section class="card stats-card-wrapper compact-card">
             <div class="section-header slim-header">
               <div>
@@ -114,7 +99,10 @@
                 <div class="section-kicker">СПИСОК</div>
                 <h2>Книги</h2>
               </div>
-              <button id="refresh-button" class="secondary">Обновить</button>
+              <div class="list-header-actions">
+                <button id="toggle-form-button" class="ghost">Добавить книгу</button>
+                <button id="refresh-button" class="secondary">Обновить</button>
+              </div>
             </div>
 
             <div class="list-toolbar surface compact-surface">

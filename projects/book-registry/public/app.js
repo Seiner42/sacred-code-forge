@@ -111,6 +111,13 @@ function startEditing(book) {
   formPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function renderRating(value) {
+  const rating = Math.max(0, Math.min(10, Number(value) || 0));
+  const filled = '★'.repeat(rating);
+  const empty = '☆'.repeat(10 - rating);
+  return `<span class="rating-stars" aria-hidden="true">${filled}${empty}</span><span class="rating-number">${rating}/10</span>`;
+}
+
 function renderBooks(books) {
   booksList.innerHTML = '';
   booksEmpty.classList.toggle('hidden', books.length > 0);
@@ -127,15 +134,15 @@ function renderBooks(books) {
             <div class="book-author">${escapeHtml(book.author)}</div>
           </div>
           <div class="book-meta">
-            <span>Оценка: ${escapeHtml(String(book.rating))}/10</span>
+            <span class="book-rating">${renderRating(book.rating)}</span>
             <span>Прочитано: ${escapeHtml(book.finishedAt)}</span>
           </div>
           ${hasComment ? `<p class="book-comment">${escapeHtml(book.comment)}</p>` : ''}
         </div>
         <div class="book-side">
           <div class="book-actions">
-            <button type="button" class="secondary small" data-action="edit">Изменить</button>
-            <button type="button" class="danger small" data-action="delete">Удалить</button>
+            <button type="button" class="icon-button secondary" data-action="edit" title="Изменить" aria-label="Изменить">✏️</button>
+            <button type="button" class="icon-button danger" data-action="delete" title="Удалить" aria-label="Удалить">🗑️</button>
           </div>
         </div>
       </div>

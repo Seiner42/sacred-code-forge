@@ -83,10 +83,6 @@ select:focus-visible {
   padding-bottom: 18px;
 }
 
-.priority-card {
-  border-color: rgba(125, 211, 252, 0.22);
-}
-
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -268,18 +264,12 @@ button.danger:hover {
   background: var(--danger-hover);
 }
 
-button.small {
-  padding: 10px 14px;
-}
-
 .section-header,
 .form-header,
 .pagination-controls,
 .book-actions,
 .page-size-control,
 .list-header-actions,
-.control-actions,
-.control-grid,
 .list-toolbar {
   display: flex;
   gap: 12px;
@@ -296,11 +286,6 @@ button.small {
   margin-bottom: 12px;
 }
 
-.control-grid {
-  justify-content: flex-start;
-}
-
-.control-actions,
 .list-header-actions {
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -444,6 +429,23 @@ button.small {
   font-size: 0.9rem;
 }
 
+.book-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-stars {
+  color: #fbbf24;
+  letter-spacing: 0.02em;
+  font-size: 0.9rem;
+}
+
+.rating-number {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .book-comment {
   margin-top: 12px;
   line-height: 1.55;
@@ -463,11 +465,17 @@ button.small {
   margin: 0;
   padding: 0;
   border-top: none;
-  min-width: 132px;
 }
 
-.book-actions button {
-  width: 100%;
+.icon-button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .pagination-controls {
@@ -497,13 +505,12 @@ button.small {
 
   .book-actions {
     flex-direction: row;
-    min-width: 0;
     width: 100%;
   }
 
-  .book-actions button {
-    width: auto;
-    flex: 1 1 0;
+  .icon-button {
+    width: 44px;
+    height: 44px;
   }
 }
 
@@ -524,8 +531,6 @@ button.small {
   .pagination-controls,
   .page-size-control,
   .list-header-actions,
-  .control-actions,
-  .control-grid,
   .list-toolbar,
   .book-actions {
     flex-direction: column;
@@ -537,9 +542,7 @@ button.small {
   .section-header button,
   .form-header button,
   .list-header-actions button,
-  .control-actions button,
   .pagination-controls button,
-  .book-actions button,
   button {
     width: 100%;
   }
@@ -575,6 +578,10 @@ button.small {
 
   .book-actions {
     width: 100%;
-    min-width: 0;
+  }
+
+  .icon-button {
+    width: 100%;
+    height: 44px;
   }
 }
