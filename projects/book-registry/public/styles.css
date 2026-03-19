@@ -58,7 +58,7 @@ select:focus-visible {
 
 .shell {
   min-height: 100vh;
-  padding: 28px 16px 48px;
+  padding: 20px 16px 40px;
 }
 
 .container {
@@ -85,21 +85,47 @@ select:focus-visible {
   box-shadow: var(--shadow);
 }
 
-.hero {
+.compact-card {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.priority-card {
+  border-color: rgba(125, 211, 252, 0.22);
+}
+
+.topbar {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.hero-copy {
-  max-width: 760px;
+.topbar-main {
+  min-width: 0;
 }
 
-.hero-actions {
+.topbar-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-title {
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  line-height: 1.05;
+  margin-top: 8px;
+}
+
+.topbar-subtitle {
+  margin-top: 6px;
+  line-height: 1.45;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
 }
 
 .eyebrow,
@@ -129,7 +155,7 @@ h1 {
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   line-height: 1.2;
 }
 
@@ -158,7 +184,7 @@ h3 {
 
 .content-grid {
   display: grid;
-  gap: 20px;
+  gap: 16px;
 }
 
 .single-column {
@@ -270,7 +296,11 @@ button.small {
 .section-header,
 .form-header {
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
+}
+
+.slim-header {
+  margin-bottom: 12px;
 }
 
 .control-grid {
@@ -317,7 +347,7 @@ button.small {
 }
 
 .stat-value {
-  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-size: clamp(1.15rem, 2.2vw, 1.7rem);
   font-weight: 700;
   line-height: 1.1;
   color: var(--text);
@@ -419,7 +449,7 @@ button.small {
 
 @media (max-width: 640px) {
   .shell {
-    padding: 14px 10px 28px;
+    padding: 12px 10px 28px;
   }
 
   .card,
@@ -428,7 +458,7 @@ button.small {
     padding: 18px;
   }
 
-  .hero,
+  .topbar,
   .section-header,
   .form-header,
   .pagination-toolbar,
@@ -442,8 +472,8 @@ button.small {
     align-items: stretch;
   }
 
-  .hero-actions,
-  .hero-actions button,
+  .topbar-actions,
+  .topbar-actions button,
   .section-header button,
   .form-header button,
   .list-header-actions button,

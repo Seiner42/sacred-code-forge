@@ -25,23 +25,27 @@
       </section>
 
       <section id="app-view" class="hidden container">
-        <header class="hero card">
-          <div class="hero-copy">
+        <header class="topbar card compact-card">
+          <div class="topbar-main">
             <div class="eyebrow">BOOK REGISTRY</div>
-            <h1>Реестр прочитанных книг</h1>
-            <p class="lede muted">Храни список прочитанного, оценки, даты и заметки в аккуратном личном контуре.</p>
+            <div class="topbar-row">
+              <div>
+                <h1 class="topbar-title">Реестр прочитанных книг</h1>
+                <p class="topbar-subtitle muted">Личный контур учёта прочитанного, оценок и заметок.</p>
+              </div>
+            </div>
           </div>
-          <div class="hero-actions">
+          <div class="topbar-actions">
             <button id="logout-button" class="secondary">Выйти</button>
           </div>
         </header>
 
         <div class="content-grid single-column">
-          <section class="card control-card">
+          <section class="card control-card priority-card">
             <div class="section-header">
               <div>
                 <div class="section-kicker">УПРАВЛЕНИЕ</div>
-                <h2>Управление реестром</h2>
+                <h2>Статус и управление</h2>
               </div>
             </div>
 
@@ -66,8 +70,8 @@
             </div>
           </section>
 
-          <section class="card stats-card-wrapper">
-            <div class="section-header">
+          <section class="card stats-card-wrapper compact-card">
+            <div class="section-header slim-header">
               <div>
                 <div class="section-kicker">СТАТИСТИКА</div>
                 <h2>Свод по библиотеке</h2>
@@ -119,7 +123,7 @@
           </section>
 
           <section class="card list-card">
-            <div class="section-header">
+            <div class="section-header slim-header">
               <div>
                 <div class="section-kicker">СПИСОК</div>
                 <h2>Книги</h2>
