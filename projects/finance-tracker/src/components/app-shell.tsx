@@ -29,16 +29,44 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <header className="mb-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 shadow-2xl shadow-black/20 backdrop-blur sm:px-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300/80 sm:text-sm">
-                Finance Tracker
-              </p>
-              <h1 className="mt-2 text-xl font-semibold leading-tight text-white sm:text-2xl">
-                Личный контур финансов
-              </h1>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-cyan-300/80 sm:text-sm">
+                    Finance Tracker
+                  </p>
+                  <h1 className="mt-2 text-xl font-semibold leading-tight text-white sm:text-2xl">
+                    Личный контур финансов
+                  </h1>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  aria-label="Выйти"
+                  title="Выйти"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white lg:hidden"
+                >
+                  <span className="text-lg">⎋</span>
+                </button>
+              </div>
             </div>
+
             <div className="flex flex-col gap-3 sm:items-end">
+              <div className="flex items-center justify-between gap-3 lg:justify-end">
+                <p className="text-xs text-slate-500 sm:text-sm">Защищённый контур</p>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  aria-label="Выйти"
+                  title="Выйти"
+                  className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white lg:inline-flex"
+                >
+                  <span className="text-lg">⎋</span>
+                </button>
+              </div>
+
               <nav className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href;
@@ -58,13 +86,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                   );
                 })}
               </nav>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="inline-flex min-h-10 items-center justify-center self-start rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white sm:self-end"
-              >
-                Выйти
-              </button>
             </div>
           </div>
         </header>
