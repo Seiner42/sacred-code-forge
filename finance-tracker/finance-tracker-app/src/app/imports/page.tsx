@@ -14,16 +14,16 @@ function statusClass(status: "ready" | "processing" | "failed") {
 
 export default function ImportsPage() {
   return (
-    <div className="space-y-6">
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <article className="rounded-2xl border border-dashed border-cyan-400/30 bg-cyan-400/10 p-8 shadow-lg shadow-black/20">
-          <p className="text-sm uppercase tracking-[0.2em] text-cyan-200/80">Imports</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white">Загрузка CSV-выписок</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-cyan-50/90">
+    <div className="space-y-4 sm:space-y-6">
+      <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr] sm:gap-6">
+        <article className="rounded-2xl border border-dashed border-cyan-400/30 bg-cyan-400/10 p-5 shadow-lg shadow-black/20 sm:p-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80 sm:text-sm">Импорт</p>
+          <h2 className="mt-3 text-2xl font-semibold text-white sm:text-3xl">Загрузка CSV-выписок</h2>
+          <p className="mt-3 text-sm leading-6 text-cyan-50/90">
             Здесь будет точка входа для импорта выписок из Альфы и Тинькофф. На текущем этапе это фронтовой макет: зона загрузки, описание сценария и история импортов.
           </p>
 
-          <div className="mt-6 rounded-2xl border border-dashed border-white/20 bg-slate-950/40 px-6 py-10 text-center">
+          <div className="mt-6 rounded-2xl border border-dashed border-white/20 bg-slate-950/40 px-4 py-8 text-center sm:px-6 sm:py-10">
             <p className="text-base font-medium text-white">Перетащи CSV сюда или выбери файл вручную</p>
             <p className="mt-2 text-sm text-slate-400">
               Поддерживаемые источники: Альфа, Тинькофф
@@ -34,8 +34,8 @@ export default function ImportsPage() {
           </div>
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-black/20">
-          <h3 className="text-lg font-semibold text-white">Что будет после загрузки</h3>
+        <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-6">
+          <h3 className="text-base font-semibold text-white sm:text-lg">Что будет после загрузки</h3>
           <ul className="mt-4 space-y-3 text-sm text-slate-300">
             <li className="rounded-xl bg-slate-950/40 px-4 py-3">Файл сохранится как raw-импорт</li>
             <li className="rounded-xl bg-slate-950/40 px-4 py-3">Строки CSV будут разобраны в единый формат</li>
@@ -45,14 +45,34 @@ export default function ImportsPage() {
         </article>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-black/20">
+      <section className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-semibold text-white">История импортов</h3>
+          <h3 className="text-lg font-semibold text-white sm:text-xl">История импортов</h3>
           <p className="mt-2 text-sm text-slate-400">
             Пока это моковые записи, чтобы почувствовать будущий контур работы.
           </p>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-white/10">
+
+        <div className="space-y-3 md:hidden">
+          {importHistory.map((item) => (
+            <article key={item.id} className="rounded-xl border border-white/10 bg-slate-950/40 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium text-white break-words">{item.fileName}</p>
+                  <p className="mt-1 text-xs text-slate-400">{item.bank} · {item.importedAt}</p>
+                </div>
+                <span className="shrink-0 text-sm text-slate-300">{item.rows}</span>
+              </div>
+              <div className="mt-3">
+                <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(item.status)}`}>
+                  {statusLabels[item.status]}
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="hidden overflow-hidden rounded-2xl border border-white/10 md:block">
           <table className="min-w-full divide-y divide-white/10 text-sm">
             <thead className="bg-white/5 text-left text-slate-400">
               <tr>

@@ -46,7 +46,7 @@ export const summaryCards: SummaryCard[] = [
   {
     title: "Операций",
     value: "126",
-    hint: "8 требуют внимания",
+    hint: "За текущий месяц",
   },
   {
     title: "Подписки",
