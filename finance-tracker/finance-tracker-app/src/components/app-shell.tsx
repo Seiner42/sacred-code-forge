@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 const navItems = [
@@ -13,6 +13,17 @@ const navItems = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.replace("/login");
+    router.refresh();
+  }
+
+  if (pathname === "/login") {
+    return <div className="min-h-screen bg-slate-950 text-slate-100">{children}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -27,25 +38,34 @@ export function AppShell({ children }: { children: ReactNode }) {
                 Личный контур финансов
               </h1>
             </div>
-            <nav className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
+            <div className="flex flex-col gap-3 sm:items-end">
+              <nav className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href;
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex min-h-11 items-center justify-center rounded-full border px-4 py-2 text-sm transition ${
-                      isActive
-                        ? "border-cyan-300/60 bg-cyan-400/15 text-white"
-                        : "border-white/10 text-slate-200 hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex min-h-11 items-center justify-center rounded-full border px-4 py-2 text-sm transition ${
+                        isActive
+                          ? "border-cyan-300/60 bg-cyan-400/15 text-white"
+                          : "border-white/10 text-slate-200 hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex min-h-10 items-center justify-center self-start rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white sm:self-end"
+              >
+                Выйти
+              </button>
+            </div>
           </div>
         </header>
         <main className="flex-1">{children}</main>
