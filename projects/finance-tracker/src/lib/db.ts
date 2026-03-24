@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
+import { DEFAULT_CATEGORIES, DEFAULT_MERCHANT_RULES } from "@/lib/defaults";
 
 const projectRoot = process.cwd();
 const dataDir = path.join(projectRoot, "data");
@@ -67,3 +68,19 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_merchant_rules_priority ON merchant_rules(priority DESC, pattern);
   CREATE INDEX IF NOT EXISTS idx_review_items_import_id ON import_review_items(import_id);
 `);
+
+function seedDefaults() {
+  const now = new Date().toISOString();
+  const insertCategory = db.prepare(`INSERT OR IGNORE INTO categories (id, name, slug, color, icon, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?, ?)`);
+  for (const category of DEFAULT_CATEGORIES) {
+    insertCategory.run(category.id, category.name, category.slug, category.color, category.icon, now, now);
+  }
+
+  const categoryBySlug = new Map((db.prepare("SELECT id, slug FROM categories").all() as { id: string; slug: string }[]).map((row) => [row.slug, row.id]));
+  const insertRule = db.prepare(`INSERT OR IGNORE INTO merchant_rules (id, match_type, pattern, merchant_normalized, category_id, direction_override, priority, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  for (const rule of DEFAULT_MERCHANT_RULES) {
+    insertRule.run(rule.id, rule.matchType, rule.pattern, rule.merchantNormalized, rule.categorySlug ? categoryBySlug.get(rule.categorySlug) ?? null : null, rule.directionOverride ?? null, rule.priority, rule.notes ?? null, now, now);
+  }
+}
+
+seedDefaults();

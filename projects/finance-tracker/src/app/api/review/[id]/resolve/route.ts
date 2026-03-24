@@ -6,7 +6,6 @@ type Payload = {
   merchantNormalized?: string;
   categoryId?: string | null;
   matchType?: "exact" | "contains";
-  includeInReports?: boolean | null;
 };
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -36,20 +35,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const normalizedName = payload.merchantNormalized.trim();
   const pattern = payload.matchType === "exact" ? item.raw_merchant : item.raw_merchant.replace(/\\/g, "/");
   const categoryId = payload.categoryId ?? item.suggested_category_id ?? null;
-  const includeValue = typeof payload.includeInReports === "boolean" ? (payload.includeInReports ? 1 : 0) : null;
 
   const transaction = db.transaction(() => {
     db.prepare(`
       INSERT INTO merchant_rules (
-        id, match_type, pattern, merchant_normalized, category_id, direction_override, include_in_reports_override, priority, notes, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, NULL, ?, 500, 'Подтверждено в ручном разборе', ?, ?)
-    `).run(ruleId, payload.matchType, pattern, normalizedName, categoryId, includeValue, now, now);
+        id, match_type, pattern, merchant_normalized, category_id, direction_override, priority, notes, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, NULL, 500, 'Подтверждено в ручном разборе', ?, ?)
+    `).run(ruleId, payload.matchType, pattern, normalizedName, categoryId, now, now);
 
     db.prepare(`
       UPDATE transactions
-      SET merchant_normalized = ?, category_id = COALESCE(?, category_id), include_in_reports = COALESCE(?, include_in_reports), updated_at = ?
+      SET merchant_normalized = ?, category_id = COALESCE(?, category_id), updated_at = ?
       WHERE import_id = ? AND raw_merchant = ?
-    `).run(normalizedName, categoryId, includeValue, now, item.import_id, item.raw_merchant);
+    `).run(normalizedName, categoryId, now, item.import_id, item.raw_merchant);
 
     db.prepare(`
       UPDATE import_review_items

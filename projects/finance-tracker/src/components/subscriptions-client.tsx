@@ -17,6 +17,10 @@ const periodLabels = { monthly: "Ежемесячно", yearly: "Ежегодн�
 const statusLabels = { active: "Активна", paused: "На паузе" };
 const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
 
+function formatCurrency(value: number) {
+  return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(value)} ₽`;
+}
+
 function statusClass(status: "active" | "paused") {
   return status === "active" ? "bg-emerald-500/15 text-emerald-300" : "bg-slate-500/20 text-slate-300";
 }
@@ -44,6 +48,22 @@ function nextChargeLabel(subscription: SubscriptionItem) {
   return `${subscription.chargeDay} ${months[(subscription.chargeMonth ?? 1) - 1]}`;
 }
 
+function paymentStateClass(subscription: SubscriptionItem) {
+  if (subscription.status !== "active") return "text-slate-400";
+
+  const now = new Date();
+  const currentMonth = now.getUTCMonth() + 1;
+  const currentDay = now.getUTCDate();
+
+  if (subscription.period === "monthly") {
+    return currentDay >= subscription.chargeDay ? "text-emerald-300" : "text-rose-300";
+  }
+
+  const chargeMonth = subscription.chargeMonth ?? 1;
+  const isPassed = currentMonth > chargeMonth || (currentMonth === chargeMonth && currentDay >= subscription.chargeDay);
+  return isPassed ? "text-emerald-300" : "text-rose-300";
+}
+
 export function SubscriptionsClient({ initialSubscriptions }: { initialSubscriptions: SubscriptionItem[] }) {
   const [subscriptions, setSubscriptions] = useState(initialSubscriptions);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,6 +74,9 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
 
   const monthly = useMemo(() => subscriptions.filter((item) => item.period === "monthly"), [subscriptions]);
   const yearly = useMemo(() => subscriptions.filter((item) => item.period === "yearly"), [subscriptions]);
+  const activeSubscriptions = useMemo(() => subscriptions.filter((item) => item.status === "active"), [subscriptions]);
+  const totalPerMonth = useMemo(() => activeSubscriptions.filter((item) => item.period === "monthly").reduce((sum, item) => sum + item.amountValue, 0), [activeSubscriptions]);
+  const totalPerYear = useMemo(() => activeSubscriptions.reduce((sum, item) => sum + (item.period === "monthly" ? item.amountValue * 12 : item.amountValue), 0), [activeSubscriptions]);
 
   function openCreateModal() {
     setEditingId(null);
@@ -137,7 +160,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
   return (
     <>
       <div className="space-y-4 sm:space-y-6">
-        <section className="grid gap-3 lg:grid-cols-3 sm:gap-4">
+        <section className="grid gap-3 lg:grid-cols-5 sm:gap-4">
           <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-6">
             <p className="text-sm text-slate-400">Всего подписок</p>
             <p className="mt-2 text-2xl font-semibold text-white sm:mt-3 sm:text-3xl">{subscriptions.length}</p>
@@ -154,6 +177,18 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
             <p className="text-sm text-slate-400">Ежегодные</p>
             <p className="mt-2 text-2xl font-semibold text-white sm:mt-3 sm:text-3xl">{yearly.length}</p>
             <p className="mt-2 text-xs text-slate-400 sm:text-sm">Списания раз в год</p>
+          </article>
+
+          <article className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 shadow-lg shadow-black/20 sm:p-6">
+            <p className="text-sm text-cyan-100/80">Всего в месяц</p>
+            <p className="mt-2 text-2xl font-semibold text-cyan-300 sm:mt-3 sm:text-3xl">{formatCurrency(Math.round(totalPerMonth))}</p>
+            <p className="mt-2 text-xs text-cyan-50/80 sm:text-sm">Только активные ежемесячные подписки</p>
+          </article>
+
+          <article className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 shadow-lg shadow-black/20 sm:p-6">
+            <p className="text-sm text-cyan-100/80">Всего в год</p>
+            <p className="mt-2 text-2xl font-semibold text-cyan-300 sm:mt-3 sm:text-3xl">{formatCurrency(Math.round(totalPerYear))}</p>
+            <p className="mt-2 text-xs text-cyan-50/80 sm:text-sm">Активные подписки: месячные × 12 + годовые</p>
           </article>
         </section>
 
@@ -182,15 +217,15 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                         {periodLabels[subscription.period]} · {nextChargeLabel(subscription)}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-medium text-cyan-300">{subscription.amount}</span>
+                    <span className={`shrink-0 text-sm font-medium ${paymentStateClass(subscription)}`}>{subscription.amount}</span>
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(subscription.status)}`}>
                       {statusLabels[subscription.status]}
                     </span>
                     <div className="flex gap-2">
-                      <button onClick={() => openEditModal(subscription)} className={actionButtonClass}>✏️</button>
-                      <button onClick={() => handleDelete(subscription)} className={actionButtonClass}>🗑️</button>
+                      <button onClick={() => openEditModal(subscription)} className={actionButtonClass} aria-label="Изменить подписку" title="Изменить">✏️</button>
+                      <button onClick={() => handleDelete(subscription)} className={actionButtonClass} aria-label="Удалить подписку" title="Удалить">🗑️</button>
                     </div>
                   </div>
                 </article>
@@ -220,14 +255,14 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                           {statusLabels[subscription.status]}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-cyan-300 whitespace-nowrap">{subscription.amount}</td>
+                      <td className={`px-4 py-3 text-right font-medium whitespace-nowrap ${paymentStateClass(subscription)}`}>{subscription.amount}</td>
                       <td className="px-4 py-3">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => openEditModal(subscription)} className={actionButtonClass}>
-                            ✏️ Изменить
+                          <button onClick={() => openEditModal(subscription)} className={actionButtonClass} aria-label="Изменить подписку" title="Изменить">
+                            ✏️
                           </button>
-                          <button onClick={() => handleDelete(subscription)} className={actionButtonClass}>
-                            🗑️ Удалить
+                          <button onClick={() => handleDelete(subscription)} className={actionButtonClass} aria-label="Удалить подписку" title="Удалить">
+                            🗑️
                           </button>
                         </div>
                       </td>

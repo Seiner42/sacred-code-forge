@@ -2,8 +2,14 @@ import type { DashboardData, OperationItem } from "@/lib/finance-data";
 
 function amountClass(item: OperationItem) {
   if (item.type === "income") return "text-emerald-300";
-  if (item.type === "transfer") return "text-cyan-300";
   return "text-rose-300";
+}
+
+function summaryValueClass(title: string) {
+  if (title === "Расходы за месяц") return "text-rose-300";
+  if (title === "Пополнения") return "text-emerald-300";
+  if (title === "Подписки в этом месяце") return "text-cyan-300";
+  return "text-white";
 }
 
 export function Dashboard({ data }: { data: DashboardData }) {
@@ -25,7 +31,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
             className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5"
           >
             <p className="text-xs text-slate-400 sm:text-sm">{card.title}</p>
-            <p className="mt-2 text-2xl font-semibold text-white sm:mt-3 sm:text-3xl">{card.value}</p>
+            <p className={`mt-2 text-2xl font-semibold sm:mt-3 sm:text-3xl ${summaryValueClass(card.title)}`}>{card.value}</p>
             <p className="mt-2 text-xs text-slate-400 sm:text-sm">{card.hint}</p>
           </article>
         ))}
@@ -46,7 +52,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-white">{item.merchant}</p>
-                    <p className="mt-1 text-xs text-slate-400">{item.date} · {item.category}</p>
+                    <p className="mt-1 text-xs text-slate-400">{item.date} · {item.categoryIcon ? `${item.categoryIcon} ` : ""}{item.category}</p>
                   </div>
                   <span className={`text-sm font-medium ${amountClass(item)}`}>{item.amount}</span>
                 </div>
@@ -69,7 +75,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
                   <tr key={item.id} className="text-slate-200">
                     <td className="px-4 py-3">{item.date}</td>
                     <td className="px-4 py-3">{item.merchant}</td>
-                    <td className="px-4 py-3 text-slate-400">{item.category}</td>
+                    <td className="px-4 py-3 text-slate-400">{item.categoryIcon ? `${item.categoryIcon} ` : ""}{item.category}</td>
                     <td className={`px-4 py-3 text-right font-medium ${amountClass(item)}`}>{item.amount}</td>
                   </tr>
                 ))}
@@ -91,7 +97,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-300">
                       {index + 1}
                     </span>
-                    <span className="truncate text-sm text-slate-200 sm:text-base">{category.name}</span>
+                    <span className="truncate text-sm text-slate-200 sm:text-base">{category.icon ? `${category.icon} ` : ""}{category.name}</span>
                   </div>
                   <span className="shrink-0 text-sm font-medium text-white sm:text-base">{category.amount}</span>
                 </li>
