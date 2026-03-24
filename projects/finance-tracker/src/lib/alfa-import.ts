@@ -51,6 +51,7 @@ type NormalizedOperation = {
   description: string | null;
   includeInReports: boolean;
   sourceRowHash: string;
+  sourceOrder: number;
   needsReview: boolean;
 };
 
@@ -126,7 +127,7 @@ function isReviewNeeded(rawMerchant: string, sourceCategory: string | null, expl
   if (["финансовые операции", "прочие расходы", ""].includes(sourceKey)) return true;
   return /^(Magazin|Am)$/i.test(inferMerchantBase(rawMerchant));
 }
-function normalizeOperation(row: AlfaCsvRow, categoryMap: Map<string, string>, rules: MerchantRuleRow[]): NormalizedOperation {
+function normalizeOperation(row: AlfaCsvRow, categoryMap: Map<string, string>, rules: MerchantRuleRow[], sourceOrder: number): NormalizedOperation {
   const operationDate = parseRuDate(row.operationDate);
   const rawMerchant = normalizeSpaces(row.merchant ?? "");
   const amount = amountToNumber(row.amount);
@@ -160,7 +161,7 @@ function normalizeOperation(row: AlfaCsvRow, categoryMap: Map<string, string>, r
     if (builtInRule.directionOverride && builtInRule.directionOverride !== "transfer") direction = builtInRule.directionOverride;
     if (typeof builtInRule.includeInReportsOverride === "boolean") includeInReports = builtInRule.includeInReportsOverride;
   }
-  return { operationDate, rawMerchant, merchantNormalized, amount, currency, direction, sourceCategory, categoryId: categoryMap.get(categorySlug) ?? categoryMap.get("other") ?? null, mcc, description, includeInReports, sourceRowHash: rowHash, needsReview: isReviewNeeded(rawMerchant, sourceCategory, explicitRuleMatched, Boolean(builtInRule)) };
+  return { operationDate, rawMerchant, merchantNormalized, amount, currency, direction, sourceCategory, categoryId: categoryMap.get(categorySlug) ?? categoryMap.get("other") ?? null, mcc, description, includeInReports, sourceRowHash: rowHash, sourceOrder, needsReview: isReviewNeeded(rawMerchant, sourceCategory, explicitRuleMatched, Boolean(builtInRule)) };
 }
 
 export type AlfaImportResult = { importId: string; rowsCount: number; rowsImported: number; rowsSkipped: number; rowsFailed: number; rowsNeedingReview: number };
@@ -169,19 +170,19 @@ export function importAlfaCsv(fileName: string, csvText: string): AlfaImportResu
   ensureBaseCategories();
   const categoryMap = getCategoryMap();
   const rules = getMerchantRules();
-  const rows = parse(csvText, { columns: true, skip_empty_lines: true, trim: true }) as AlfaCsvRow[];
+  const rows = parse(csvText, { columns: true, skip_empty_lines: true, trim: true, bom: true }) as AlfaCsvRow[];
   const now = new Date().toISOString();
   const importId = `imp_${randomUUID()}`;
   db.prepare(`INSERT INTO imports (id, source, file_name, imported_at, rows_count, rows_imported, rows_skipped, rows_needing_review, rows_failed, status, error_message, created_at) VALUES (?, 'alfa', ?, ?, ?, 0, 0, 0, 0, 'processing', NULL, ?)`).run(importId, fileName, now, rows.length, now);
-  const insertTransaction = db.prepare(`INSERT INTO transactions (id, import_id, operation_date, raw_merchant, merchant_normalized, amount, currency, direction, category_id, source_category, mcc, description, include_in_reports, source_row_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const insertTransaction = db.prepare(`INSERT INTO transactions (id, import_id, operation_date, raw_merchant, merchant_normalized, amount, currency, direction, category_id, source_category, mcc, description, include_in_reports, source_row_hash, source_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
   const insertReview = db.prepare(`INSERT INTO import_review_items (id, import_id, raw_merchant, source_category, mcc, sample_count, suggested_merchant_normalized, suggested_category_id, status, resolved_rule_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NULL, ?, ?)`);
   let rowsImported = 0; let rowsSkipped = 0; let rowsFailed = 0; const reviewMap = new Map<string, ReviewCandidate>();
   const transaction = db.transaction(() => {
-    for (const row of rows) {
+    for (const [index, row] of rows.entries()) {
       try {
-        const normalized = normalizeOperation(row, categoryMap, rules);
+        const normalized = normalizeOperation(row, categoryMap, rules, index);
         if (db.prepare("SELECT id FROM transactions WHERE source_row_hash = ?").get(normalized.sourceRowHash)) { rowsSkipped += 1; continue; }
-        insertTransaction.run(`tx_${randomUUID()}`, importId, normalized.operationDate, normalized.rawMerchant, normalized.merchantNormalized, normalized.amount, normalized.currency, normalized.direction, normalized.categoryId, normalized.sourceCategory, normalized.mcc, normalized.description, normalized.includeInReports ? 1 : 0, normalized.sourceRowHash, now, now);
+        insertTransaction.run(`tx_${randomUUID()}`, importId, normalized.operationDate, normalized.rawMerchant, normalized.merchantNormalized, normalized.amount, normalized.currency, normalized.direction, normalized.categoryId, normalized.sourceCategory, normalized.mcc, normalized.description, normalized.includeInReports ? 1 : 0, normalized.sourceRowHash, normalized.sourceOrder, now, now);
         rowsImported += 1;
         if (normalized.needsReview) {
           const key = `${normalized.rawMerchant}|${normalized.sourceCategory ?? ""}|${normalized.mcc ?? ""}`;

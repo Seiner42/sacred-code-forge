@@ -99,6 +99,7 @@ CREATE INDEX IF NOT EXISTS idx_transactions_operation_date ON transactions(opera
 CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_import_id ON transactions(import_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_source_row_hash ON transactions(source_row_hash);
+CREATE INDEX IF NOT EXISTS idx_transactions_operation_order ON transactions(operation_date DESC, source_order ASC, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_category_id ON subscriptions(category_id);
 CREATE INDEX IF NOT EXISTS idx_imports_imported_at ON imports(imported_at);
 CREATE INDEX IF NOT EXISTS idx_merchant_rules_priority ON merchant_rules(priority DESC, pattern);

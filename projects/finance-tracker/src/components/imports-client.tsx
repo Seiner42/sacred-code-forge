@@ -105,7 +105,7 @@ export function ImportsClient({ initialImports }: { initialImports: ImportHistor
         </article>
 
         <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-6">
-          <h3 className="text-base font-semibold text-white sm:text-lg">Что делает импорт сейчас</h3>
+          <h3 className="text-base font-semibold text-white sm:text-lg">Как работает импорт</h3>
           <ul className="mt-4 space-y-3 text-sm text-slate-300">
             <li className="rounded-xl bg-slate-950/40 px-4 py-3">Поддерживает только Альфа CSV</li>
             <li className="rounded-xl bg-slate-950/40 px-4 py-3">Не сохраняет сам CSV-файл</li>

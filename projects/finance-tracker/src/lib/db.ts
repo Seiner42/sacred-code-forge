@@ -51,6 +51,7 @@ ensureColumn("transactions", "raw_merchant", "raw_merchant TEXT NOT NULL DEFAULT
 ensureColumn("transactions", "source_category", "source_category TEXT");
 ensureColumn("transactions", "mcc", "mcc TEXT");
 ensureColumn("transactions", "source_row_hash", "source_row_hash TEXT");
+ensureColumn("transactions", "source_order", "source_order INTEGER");
 
 ensureColumn("subscriptions", "charge_day", "charge_day INTEGER");
 ensureColumn("subscriptions", "charge_month", "charge_month INTEGER");
@@ -61,6 +62,7 @@ if (!db.prepare("SELECT name FROM sqlite_master WHERE type='index' AND name='idx
 
 db.exec(`
   CREATE INDEX IF NOT EXISTS idx_transactions_import_id ON transactions(import_id);
+  CREATE INDEX IF NOT EXISTS idx_transactions_operation_order ON transactions(operation_date DESC, source_order ASC, created_at DESC);
   CREATE INDEX IF NOT EXISTS idx_imports_imported_at ON imports(imported_at);
   CREATE INDEX IF NOT EXISTS idx_merchant_rules_priority ON merchant_rules(priority DESC, pattern);
   CREATE INDEX IF NOT EXISTS idx_review_items_import_id ON import_review_items(import_id);

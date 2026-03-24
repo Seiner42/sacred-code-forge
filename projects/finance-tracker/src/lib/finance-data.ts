@@ -34,7 +34,7 @@ export type ReviewItem = { id: string; importId: string; rawMerchant: string; so
 export type CategoryOption = { id: string; name: string; slug: string };
 export type CategoryAdminItem = { id: string; name: string; slug: string; color: string | null; icon: string | null; isActive: boolean };
 
-type TransactionRow = { id: string; operation_date: string; merchant_normalized: string; amount: number; direction: "expense" | "income" | "transfer"; include_in_reports: number; description: string | null; category_id: string | null; category_name: string | null; };
+type TransactionRow = { id: string; operation_date: string; merchant_normalized: string; amount: number; direction: "expense" | "income" | "transfer"; include_in_reports: number; description: string | null; category_id: string | null; category_name: string | null; source_order: number | null; created_at: string; };
 type SubscriptionRow = { id: string; name: string; period: "monthly" | "yearly"; amount: number; is_active: number; created_at: string; charge_day: number | null; charge_month: number | null; };
 type ImportRow = { id: string; source: "alfa" | "tinkoff"; file_name: string; imported_at: string; rows_count: number; rows_imported: number; rows_skipped: number; rows_needing_review: number; rows_failed: number; status: "ready" | "processing" | "failed"; };
 type ReviewRow = { id: string; import_id: string; raw_merchant: string; source_category: string | null; mcc: string | null; sample_count: number; suggested_merchant_normalized: string | null; suggested_category_id: string | null; };
@@ -51,7 +51,7 @@ function nextChargeFromSchedule(period: "monthly" | "yearly", chargeDay: number 
   const month = chargeMonth ?? (fallback.getUTCMonth() + 1);
   return `${String(day).padStart(2, "0")}.${String(month).padStart(2, "0")}`;
 }
-function getTransactionRows() { return db.prepare(`SELECT transactions.id, transactions.operation_date, transactions.merchant_normalized, transactions.amount, transactions.direction, transactions.include_in_reports, transactions.description, transactions.category_id, categories.name AS category_name FROM transactions LEFT JOIN categories ON categories.id = transactions.category_id ORDER BY transactions.operation_date DESC, transactions.created_at DESC`).all() as TransactionRow[]; }
+function getTransactionRows() { return db.prepare(`SELECT transactions.id, transactions.operation_date, transactions.merchant_normalized, transactions.amount, transactions.direction, transactions.include_in_reports, transactions.description, transactions.category_id, transactions.source_order, transactions.created_at, categories.name AS category_name FROM transactions LEFT JOIN categories ON categories.id = transactions.category_id ORDER BY transactions.operation_date DESC, CASE WHEN transactions.source_order IS NULL THEN 1 ELSE 0 END ASC, transactions.source_order ASC, transactions.created_at DESC`).all() as TransactionRow[]; }
 function getSubscriptionRows() { return db.prepare(`SELECT id, name, period, amount, is_active, created_at, charge_day, charge_month FROM subscriptions ORDER BY is_active DESC, amount DESC, name ASC`).all() as SubscriptionRow[]; }
 function getImportRows() { return db.prepare(`SELECT id, source, file_name, imported_at, rows_count, rows_imported, rows_skipped, rows_needing_review, rows_failed, status FROM imports ORDER BY imported_at DESC, created_at DESC`).all() as ImportRow[]; }
 function getReviewRows() { return db.prepare(`SELECT id, import_id, raw_merchant, source_category, mcc, sample_count, suggested_merchant_normalized, suggested_category_id FROM import_review_items WHERE status = 'pending' ORDER BY sample_count DESC, raw_merchant ASC`).all() as ReviewRow[]; }
@@ -64,4 +64,65 @@ export function getImports() { return getImportRows().map(toImportItem); }
 export function getPendingReviewItems(): ReviewItem[] { return getReviewRows().map((row) => ({ id: row.id, importId: row.import_id, rawMerchant: row.raw_merchant, sourceCategory: row.source_category, mcc: row.mcc, sampleCount: row.sample_count, suggestedMerchantNormalized: row.suggested_merchant_normalized ?? row.raw_merchant, suggestedCategoryId: row.suggested_category_id })); }
 export function getCategories(): CategoryOption[] { return (db.prepare("SELECT id, name, slug FROM categories WHERE is_active = 1 ORDER BY name ASC").all() as CategoryRow[]).map((row) => ({ id: row.id, name: row.name, slug: row.slug })); }
 export function getAllCategories(): CategoryAdminItem[] { return (db.prepare("SELECT id, name, slug, color, icon, is_active FROM categories ORDER BY name ASC").all() as CategoryRow[]).map((row) => ({ id: row.id, name: row.name, slug: row.slug, color: row.color ?? null, icon: row.icon ?? null, isActive: Boolean(row.is_active) })); }
-export function getDashboardData(): DashboardData { const transactionRows = getTransactionRows(); const subscriptionItems = getSubscriptionRows().map(toSubscriptionItem); const fallbackMonthKey = new Date().toISOString().slice(0, 7); const currentMonthKey = transactionRows[0]?.operation_date.slice(0, 7) ?? fallbackMonthKey; const currentMonthTransactions = transactionRows.filter((row) => row.operation_date.startsWith(currentMonthKey)); const expenses = currentMonthTransactions.filter((row) => row.direction !== "income" && row.include_in_reports).reduce((sum, row) => sum + row.amount, 0); const incomes = currentMonthTransactions.filter((row) => row.direction === "income").reduce((sum, row) => sum + row.amount, 0); const operationsCount = currentMonthTransactions.length; const monthlySubscriptions = subscriptionItems.filter((item) => item.status === "active").reduce((sum, item) => sum + (item.period === "monthly" ? item.amountValue : item.amountValue / 12), 0); const topCategories = currentMonthTransactions.filter((row) => row.direction !== "income" && row.include_in_reports).reduce((map, row) => { const key = row.category_name ?? "Без категории"; map.set(key, (map.get(key) ?? 0) + row.amount); return map; }, new Map<string, number>()); const topCategoriesItems = Array.from(topCategories.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([name, amount]) => ({ name, amount: formatCurrency(amount) })); return { monthLabel: monthLabelFromIso(currentMonthKey), summaryCards: [{ title: "Расходы за месяц", value: formatCurrency(expenses), hint: "С учётом включённых в отчёты расходов" }, { title: "Пополнения", value: formatCurrency(incomes, { sign: incomes > 0 }), hint: "Отдельно от внутренних переводов" }, { title: "Операций", value: String(operationsCount), hint: currentMonthTransactions.length > 0 ? "За выбранный рабочий месяц" : "Пока операций нет" }, { title: "Подписки / мес.", value: formatCurrency(monthlySubscriptions), hint: subscriptionItems.length > 0 ? "Активные месячные и приведённые годовые" : "Пока подписок нет" }], recentTransactions: currentMonthTransactions.slice(0, 5).map(toOperationItem), topCategories: topCategoriesItems, subscriptions: subscriptionItems.slice(0, 3) }; }
+export function getDashboardData(): DashboardData {
+  const transactionRows = getTransactionRows();
+  const subscriptionItems = getSubscriptionRows().map(toSubscriptionItem);
+  const fallbackMonthKey = new Date().toISOString().slice(0, 7);
+  const currentMonthKey = transactionRows[0]?.operation_date.slice(0, 7) ?? fallbackMonthKey;
+  const currentMonthTransactions = transactionRows.filter((row) => row.operation_date.startsWith(currentMonthKey));
+
+  const expenses = currentMonthTransactions
+    .filter((row) => (row.direction === "expense" || (row.direction === "transfer" && row.amount < 0)) && row.include_in_reports)
+    .reduce((sum, row) => sum + Math.abs(row.amount), 0);
+
+  const incomes = currentMonthTransactions
+    .filter((row) => row.direction === "income" || (row.direction === "transfer" && row.amount > 0))
+    .reduce((sum, row) => sum + row.amount, 0);
+
+  const operationsCount = currentMonthTransactions.length;
+  const monthlySubscriptions = subscriptionItems
+    .filter((item) => item.status === "active")
+    .reduce((sum, item) => sum + (item.period === "monthly" ? item.amountValue : item.amountValue / 12), 0);
+
+  const topCategories = currentMonthTransactions
+    .filter((row) => row.direction !== "income" && row.include_in_reports)
+    .reduce((map, row) => {
+      const key = row.category_name ?? "Без категории";
+      map.set(key, (map.get(key) ?? 0) + row.amount);
+      return map;
+    }, new Map<string, number>());
+
+  const topCategoriesItems = Array.from(topCategories.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([name, amount]) => ({ name, amount: formatCurrency(amount) }));
+
+  return {
+    monthLabel: monthLabelFromIso(currentMonthKey),
+    summaryCards: [
+      {
+        title: "Расходы за месяц",
+        value: formatCurrency(expenses),
+        hint: "С учётом включённых в отчёты расходов",
+      },
+      {
+        title: "Пополнения",
+        value: formatCurrency(incomes, { sign: incomes > 0 }),
+        hint: "С учётом положительных внутренних переводов",
+      },
+      {
+        title: "Операций",
+        value: String(operationsCount),
+        hint: currentMonthTransactions.length > 0 ? "За выбранный рабочий месяц" : "Пока операций нет",
+      },
+      {
+        title: "Подписки / мес.",
+        value: formatCurrency(monthlySubscriptions),
+        hint: subscriptionItems.length > 0 ? "Активные месячные и приведённые годовые" : "Пока подписок нет",
+      },
+    ],
+    recentTransactions: currentMonthTransactions.slice(0, 5).map(toOperationItem),
+    topCategories: topCategoriesItems,
+    subscriptions: subscriptionItems.slice(0, 3),
+  };
+}

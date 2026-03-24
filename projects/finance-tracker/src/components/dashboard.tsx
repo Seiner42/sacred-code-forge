@@ -36,7 +36,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
           <div className="mb-4">
             <h2 className="text-base font-semibold text-white sm:text-lg">Последние операции месяца</h2>
             <p className="text-xs text-slate-400 sm:text-sm">
-              Живые данные из SQLite-контурa текущего рабочего месяца
+              Операции за текущий месяц
             </p>
           </div>
 
