@@ -1,6 +1,12 @@
-import { recentTransactions, subscriptions, summaryCards, topCategories } from "@/lib/mock-data";
+import type { DashboardData, OperationItem } from "@/lib/finance-data";
 
-export function Dashboard() {
+function amountClass(item: OperationItem) {
+  if (item.type === "income") return "text-emerald-300";
+  if (item.type === "transfer") return "text-cyan-300";
+  return "text-rose-300";
+}
+
+export function Dashboard({ data }: { data: DashboardData }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <section className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 shadow-lg shadow-black/20 sm:p-5">
@@ -8,12 +14,12 @@ export function Dashboard() {
           Сводка
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
-          Март 2026
+          {data.monthLabel}
         </h2>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4">
-        {summaryCards.map((card) => (
+        {data.summaryCards.map((card) => (
           <article
             key={card.title}
             className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5"
@@ -30,19 +36,19 @@ export function Dashboard() {
           <div className="mb-4">
             <h2 className="text-base font-semibold text-white sm:text-lg">Последние операции месяца</h2>
             <p className="text-xs text-slate-400 sm:text-sm">
-              Только операции за текущий месяц, без исторических хвостов
+              Живые данные из SQLite-контурa текущего рабочего месяца
             </p>
           </div>
 
           <div className="space-y-3 md:hidden">
-            {recentTransactions.map((item) => (
+            {data.recentTransactions.map((item) => (
               <div key={item.id} className="rounded-xl border border-white/10 bg-slate-950/40 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-white">{item.merchant}</p>
                     <p className="mt-1 text-xs text-slate-400">{item.date} · {item.category}</p>
                   </div>
-                  <span className="text-sm font-medium text-white">{item.amount}</span>
+                  <span className={`text-sm font-medium ${amountClass(item)}`}>{item.amount}</span>
                 </div>
               </div>
             ))}
@@ -59,12 +65,12 @@ export function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
-                {recentTransactions.map((item) => (
+                {data.recentTransactions.map((item) => (
                   <tr key={item.id} className="text-slate-200">
                     <td className="px-4 py-3">{item.date}</td>
                     <td className="px-4 py-3">{item.merchant}</td>
                     <td className="px-4 py-3 text-slate-400">{item.category}</td>
-                    <td className="px-4 py-3 text-right font-medium text-white">{item.amount}</td>
+                    <td className={`px-4 py-3 text-right font-medium ${amountClass(item)}`}>{item.amount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -76,7 +82,7 @@ export function Dashboard() {
           <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
             <h2 className="text-base font-semibold text-white sm:text-lg">Топ категорий месяца</h2>
             <ul className="mt-4 space-y-3">
-              {topCategories.map((category, index) => (
+              {data.topCategories.map((category, index) => (
                 <li
                   key={category.name}
                   className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-3 sm:px-4"
@@ -100,11 +106,11 @@ export function Dashboard() {
                 <p className="text-xs text-slate-400 sm:text-sm">Регулярная нагрузка в текущем периоде</p>
               </div>
               <span className="shrink-0 rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-medium text-cyan-300">
-                {subscriptions.length} шт.
+                {data.subscriptions.length} шт.
               </span>
             </div>
             <ul className="mt-4 space-y-3">
-              {subscriptions.slice(0, 3).map((subscription) => (
+              {data.subscriptions.map((subscription) => (
                 <li
                   key={subscription.id}
                   className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3"

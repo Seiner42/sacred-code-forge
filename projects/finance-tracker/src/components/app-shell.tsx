@@ -9,6 +9,8 @@ const navItems = [
   { href: "/operations", label: "Операции" },
   { href: "/subscriptions", label: "Подписки" },
   { href: "/imports", label: "Импорт" },
+  { href: "/review", label: "Разбор" },
+  { href: "/admin", label: "Справочники" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -33,54 +35,22 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-cyan-300/80 sm:text-sm">
-                    Finance Tracker
-                  </p>
-                  <h1 className="mt-2 text-xl font-semibold leading-tight text-white sm:text-2xl">
-                    Личный контур финансов
-                  </h1>
+                  <p className="text-xs uppercase tracking-[0.25em] text-cyan-300/80 sm:text-sm">Finance Tracker</p>
+                  <h1 className="mt-2 text-xl font-semibold leading-tight text-white sm:text-2xl">Личный контур финансов</h1>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  aria-label="Выйти"
-                  title="Выйти"
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white lg:hidden"
-                >
-                  <span className="text-lg">⎋</span>
-                </button>
+                <button type="button" onClick={handleLogout} aria-label="Выйти" title="Выйти" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white lg:hidden"><span className="text-lg">⎋</span></button>
               </div>
             </div>
-
             <div className="flex flex-col gap-3 sm:items-end">
               <div className="flex items-center justify-between gap-3 lg:justify-end">
                 <p className="text-xs text-slate-500 sm:text-sm">Защищённый контур</p>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  aria-label="Выйти"
-                  title="Выйти"
-                  className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white lg:inline-flex"
-                >
-                  <span className="text-lg">⎋</span>
-                </button>
+                <button type="button" onClick={handleLogout} aria-label="Выйти" title="Выйти" className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 text-slate-300 transition hover:border-rose-400/50 hover:bg-rose-500/10 hover:text-white lg:inline-flex"><span className="text-lg">⎋</span></button>
               </div>
-
               <nav className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href;
-
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex min-h-11 items-center justify-center rounded-full border px-4 py-2 text-sm transition ${
-                        isActive
-                          ? "border-cyan-300/60 bg-cyan-400/15 text-white"
-                          : "border-white/10 text-slate-200 hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
-                      }`}
-                    >
+                    <Link key={item.href} href={item.href} className={`flex min-h-11 items-center justify-center rounded-full border px-4 py-2 text-sm transition ${isActive ? "border-cyan-300/60 bg-cyan-400/15 text-white" : "border-white/10 text-slate-200 hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"}`}>
                       {item.label}
                     </Link>
                   );
