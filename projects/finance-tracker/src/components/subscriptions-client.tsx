@@ -14,15 +14,31 @@ type FormState = {
 };
 
 const periodLabels = { monthly: "Ежемесячно", yearly: "Ежегодно" };
-const statusLabels = { active: "Активна", paused: "На паузе" };
 const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
 
 function formatCurrency(value: number) {
   return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(value)} ₽`;
 }
 
-function statusClass(status: "active" | "paused") {
-  return status === "active" ? "bg-emerald-500/15 text-emerald-300" : "bg-slate-500/20 text-slate-300";
+function paymentState(subscription: SubscriptionItem) {
+  const now = new Date();
+  const currentMonth = now.getUTCMonth() + 1;
+  const currentDay = now.getUTCDate();
+
+  if (subscription.period === "monthly") {
+    return currentDay >= subscription.chargeDay;
+  }
+
+  const chargeMonth = subscription.chargeMonth ?? 1;
+  return currentMonth > chargeMonth || (currentMonth === chargeMonth && currentDay >= subscription.chargeDay);
+}
+
+function paymentStateLabel(subscription: SubscriptionItem) {
+  return paymentState(subscription) ? "Оплачено" : "Не оплачено";
+}
+
+function paymentBadgeClass(subscription: SubscriptionItem) {
+  return paymentState(subscription) ? "bg-emerald-500/15 text-emerald-300" : "bg-rose-500/15 text-rose-300";
 }
 
 const actionButtonClass =
@@ -49,19 +65,7 @@ function nextChargeLabel(subscription: SubscriptionItem) {
 }
 
 function paymentStateClass(subscription: SubscriptionItem) {
-  if (subscription.status !== "active") return "text-slate-400";
-
-  const now = new Date();
-  const currentMonth = now.getUTCMonth() + 1;
-  const currentDay = now.getUTCDate();
-
-  if (subscription.period === "monthly") {
-    return currentDay >= subscription.chargeDay ? "text-emerald-300" : "text-rose-300";
-  }
-
-  const chargeMonth = subscription.chargeMonth ?? 1;
-  const isPassed = currentMonth > chargeMonth || (currentMonth === chargeMonth && currentDay >= subscription.chargeDay);
-  return isPassed ? "text-emerald-300" : "text-rose-300";
+  return paymentState(subscription) ? "text-emerald-300" : "text-rose-300";
 }
 
 export function SubscriptionsClient({ initialSubscriptions }: { initialSubscriptions: SubscriptionItem[] }) {
@@ -220,8 +224,8 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                     <span className={`shrink-0 text-sm font-medium ${paymentStateClass(subscription)}`}>{subscription.amount}</span>
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(subscription.status)}`}>
-                      {statusLabels[subscription.status]}
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
+                      {paymentStateLabel(subscription)}
                     </span>
                     <div className="flex gap-2">
                       <button onClick={() => openEditModal(subscription)} className={actionButtonClass} aria-label="Изменить подписку" title="Изменить">✏️</button>
@@ -239,7 +243,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                     <th className="px-4 py-3 font-medium">Название</th>
                     <th className="px-4 py-3 font-medium">Период</th>
                     <th className="px-4 py-3 font-medium">Списание</th>
-                    <th className="px-4 py-3 font-medium">Статус</th>
+                    <th className="px-4 py-3 font-medium">Оплата</th>
                     <th className="px-4 py-3 font-medium text-right">Сумма</th>
                     <th className="px-4 py-3 font-medium text-right">Действия</th>
                   </tr>
@@ -251,8 +255,8 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                       <td className="px-4 py-3 text-slate-400">{periodLabels[subscription.period]}</td>
                       <td className="px-4 py-3 text-slate-400">{nextChargeLabel(subscription)}</td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(subscription.status)}`}>
-                          {statusLabels[subscription.status]}
+                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
+                          {paymentStateLabel(subscription)}
                         </span>
                       </td>
                       <td className={`px-4 py-3 text-right font-medium whitespace-nowrap ${paymentStateClass(subscription)}`}>{subscription.amount}</td>
@@ -279,7 +283,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
               <ul className="mt-4 space-y-3 text-sm text-slate-300">
                 <li className="rounded-xl bg-slate-950/40 px-4 py-3">Добавляй и редактируй подписки вручную</li>
                 <li className="rounded-xl bg-slate-950/40 px-4 py-3">Для годовых списаний указывай день и месяц</li>
-                <li className="rounded-xl bg-slate-950/40 px-4 py-3">Статус помогает скрывать неактуальные подписки</li>
+                <li className="rounded-xl bg-slate-950/40 px-4 py-3">Цвет и подпись показывают, прошла ли дата оплаты в текущем цикле</li>
               </ul>
             </article>
           </div>
