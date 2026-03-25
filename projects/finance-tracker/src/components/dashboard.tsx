@@ -70,7 +70,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
         ))}
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[1.4fr_1fr] sm:gap-6">
+      <section className="grid items-start gap-4 xl:grid-cols-[1.4fr_1fr] sm:gap-6">
         <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
           <div className="mb-4">
             <h2 className="text-base font-semibold text-white sm:text-lg">Последние операции месяца</h2>
@@ -117,32 +117,36 @@ export function Dashboard({ data }: { data: DashboardData }) {
           </div>
         </article>
 
-        <div className="space-y-4 sm:space-y-6">
-          <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
-            <h2 className="text-base font-semibold text-white sm:text-lg">Топ категорий месяца</h2>
-            <ul className="mt-4 space-y-3">
-              {data.topCategories.map((category, index) => (
-                <li
-                  key={category.name}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-3 sm:px-4"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-300">
-                      {index + 1}
-                    </span>
-                    <span className="truncate text-sm text-slate-200 sm:text-base">{category.icon ? `${category.icon} ` : ""}{category.name}</span>
-                  </div>
-                  <span className="shrink-0 text-sm font-medium text-white sm:text-base">{category.amount}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
+        <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
+          <h2 className="text-base font-semibold text-white sm:text-lg">Топ категорий месяца</h2>
+          <ul className="mt-4 space-y-3">
+            {data.topCategories.map((category, index) => (
+              <li
+                key={category.name}
+                className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-3 sm:px-4"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-300">
+                    {index + 1}
+                  </span>
+                  <span className="truncate text-sm text-slate-200 sm:text-base">{category.icon ? `${category.icon} ` : ""}{category.name}</span>
+                </div>
+                <span className="shrink-0 text-sm font-medium text-white sm:text-base">{category.amount}</span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      </section>
 
-          <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
-            <div>
-              <h2 className="text-base font-semibold text-white sm:text-lg">Подписки месяца</h2>
-              <p className="mt-1 text-xs text-slate-400 sm:text-sm">Сначала подписки, требующие ручного контроля, затем — автоплатёж</p>
-              <div className="mt-3 flex flex-wrap gap-2">
+      <section>
+        <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
+          <div className="border-b border-white/10 pb-5">
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-white sm:text-lg">Подписки месяца</h2>
+                <p className="mt-1 text-xs text-slate-400 sm:text-sm">Сначала подписки, требующие ручного контроля, затем — автоплатёж</p>
+              </div>
+              <div className="flex flex-wrap gap-2 xl:justify-end">
                 <span className="inline-flex items-center rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-medium text-cyan-300">
                   {data.subscriptions.length} подписок в этом месяце
                 </span>
@@ -151,90 +155,78 @@ export function Dashboard({ data }: { data: DashboardData }) {
                 </span>
               </div>
             </div>
+          </div>
 
-            {data.subscriptions.length > 0 ? (
-              <div className="mt-5 space-y-5">
-                {data.manualSubscriptions.length > 0 ? (
-                  <div>
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <div>
-                        <h3 className="text-sm font-semibold text-white sm:text-base">Требуют внимания</h3>
-                        <p className="text-xs text-amber-50/80 sm:text-sm">Подписки без автоплатежа</p>
-                      </div>
+          {data.subscriptions.length > 0 ? (
+            <div className="mt-6 grid gap-6 xl:grid-cols-2">
+              {data.manualSubscriptions.length > 0 ? (
+                <div>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-semibold text-white sm:text-base">Требуют внимания</h3>
+                      <p className="text-xs text-amber-50/80 sm:text-sm">Подписки без автоплатежа</p>
                     </div>
-                    <ul className="space-y-3">
-                      {data.manualSubscriptions.map((subscription) => (
-                        <li
-                          key={subscription.id}
-                          className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-3"
-                        >
-                          <div className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                              <div className="min-w-0">
-                                <p className="font-medium text-white">{subscription.name}</p>
-                                <p className="text-xs text-amber-50/80 sm:text-sm">{subscriptionScheduleLabel(subscription)}</p>
-                              </div>
-                              <span className="text-sm font-medium text-amber-200">{subscription.amount}</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${autoPayBadgeClass(subscription)}`}>
-                                {autoPayLabel(subscription)}
-                              </span>
-                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
-                                {paymentLabel(subscription)}
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
-                ) : null}
+                  <ul className="space-y-3">
+                    {data.manualSubscriptions.map((subscription) => (
+                      <li
+                        key={subscription.id}
+                        className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-3"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="min-w-0 truncate font-medium text-white">{subscription.name}</p>
+                          <div className="flex shrink-0 items-center gap-2 text-xs sm:text-sm">
+                            <span className="text-amber-50/80">{subscription.nextCharge}</span>
+                            <span className="rounded-full bg-amber-400/15 px-2.5 py-1 font-medium text-amber-200">
+                              вручную
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                  Все активные подписки сейчас помечены как автоплатёж.
+                </div>
+              )}
 
-                {data.subscriptions.some((subscription) => subscription.autoPay) ? (
-                  <div className={data.manualSubscriptions.length > 0 ? "border-t border-white/10 pt-5" : ""}>
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <div>
-                        <h3 className="text-sm font-semibold text-white sm:text-base">Автоплатёж</h3>
-                        <p className="text-xs text-slate-400 sm:text-sm">Подписки, которые спишутся автоматически</p>
-                      </div>
+              {data.subscriptions.some((subscription) => subscription.autoPay) ? (
+                <div>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-semibold text-white sm:text-base">Автоплатёж</h3>
+                      <p className="text-xs text-slate-400 sm:text-sm">Подписки, которые спишутся автоматически</p>
                     </div>
-                    <ul className="space-y-3">
-                      {data.subscriptions.filter((subscription) => subscription.autoPay).map((subscription) => (
-                        <li
-                          key={subscription.id}
-                          className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3"
-                        >
-                          <div className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                              <div className="min-w-0">
-                                <p className="font-medium text-white">{subscription.name}</p>
-                                <p className="text-xs text-slate-400 sm:text-sm">{subscriptionScheduleLabel(subscription)}</p>
-                              </div>
-                              <span className="text-sm font-medium text-cyan-300">{subscription.amount}</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${autoPayBadgeClass(subscription)}`}>
-                                {autoPayLabel(subscription)}
-                              </span>
-                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
-                                {paymentLabel(subscription)}
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
-                ) : null}
-              </div>
-            ) : (
-              <div className="mt-4 rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
-                В этом месяце регулярных подписок нет.
-              </div>
-            )}
-          </article>
-        </div>
+                  <ul className="space-y-3">
+                    {data.subscriptions.filter((subscription) => subscription.autoPay).map((subscription) => (
+                      <li
+                        key={subscription.id}
+                        className="rounded-xl border border-cyan-400/15 bg-slate-950/40 px-4 py-3"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="min-w-0 truncate font-medium text-white">{subscription.name}</p>
+                          <div className="flex shrink-0 items-center gap-2 text-xs sm:text-sm">
+                            <span className="text-slate-400">{subscription.nextCharge}</span>
+                            <span className="rounded-full bg-cyan-400/15 px-2.5 py-1 font-medium text-cyan-300">
+                              авто
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+              В этом месяце регулярных подписок нет.
+            </div>
+          )}
+        </article>
       </section>
     </div>
   );

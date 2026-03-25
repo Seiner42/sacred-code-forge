@@ -110,14 +110,13 @@ export function getDashboardData(): DashboardData {
 
   const topCategoriesItems = Array.from(topCategories.entries())
     .sort((a, b) => b[1].amount - a[1].amount)
-    .slice(0, 4)
+    .slice(0, 5)
     .map(([name, value]) => ({ name, amount: formatCurrency(value.amount), icon: value.icon }));
 
   const manualSubscriptions = subscriptionItems
     .filter((item) => item.status === "active" && !item.autoPay)
     .filter((item) => item.period === "monthly" || item.chargeMonth === currentMonthNumber)
-    .sort((a, b) => a.chargeDay - b.chargeDay || a.name.localeCompare(b.name))
-    .slice(0, 5);
+    .sort((a, b) => a.chargeDay - b.chargeDay || a.name.localeCompare(b.name));
 
   return {
     monthLabel: monthLabelFromIso(currentMonthKey),
@@ -148,8 +147,7 @@ export function getDashboardData(): DashboardData {
     subscriptions: subscriptionItems
       .filter((item) => item.status === "active")
       .filter((item) => item.period === "monthly" || item.chargeMonth === currentMonthNumber)
-      .sort((a, b) => a.chargeDay - b.chargeDay || a.name.localeCompare(b.name))
-      .slice(0, 5),
+      .sort((a, b) => a.chargeDay - b.chargeDay || a.name.localeCompare(b.name)),
     manualSubscriptions,
   };
 }
