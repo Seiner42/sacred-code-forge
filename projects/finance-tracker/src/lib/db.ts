@@ -56,6 +56,8 @@ ensureColumn("transactions", "source_order", "source_order INTEGER");
 
 ensureColumn("subscriptions", "charge_day", "charge_day INTEGER");
 ensureColumn("subscriptions", "charge_month", "charge_month INTEGER");
+ensureColumn("subscriptions", "auto_pay", "auto_pay INTEGER NOT NULL DEFAULT 0");
+db.exec("UPDATE subscriptions SET auto_pay = 0 WHERE auto_pay IS NULL");
 
 if (!db.prepare("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_transactions_source_row_hash'").get()) {
   db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_source_row_hash ON transactions(source_row_hash)");

@@ -1,4 +1,4 @@
-import type { DashboardData, OperationItem } from "@/lib/finance-data";
+import type { DashboardData, OperationItem, SubscriptionItem } from "@/lib/finance-data";
 
 function amountClass(item: OperationItem) {
   if (item.type === "income") return "text-emerald-300";
@@ -10,6 +10,39 @@ function summaryValueClass(title: string) {
   if (title === "Пополнения") return "text-emerald-300";
   if (title === "Подписки в этом месяце") return "text-cyan-300";
   return "text-white";
+}
+
+function subscriptionScheduleLabel(subscription: SubscriptionItem) {
+  return `${subscription.period === "monthly" ? "Ежемесячно" : "Ежегодно"} · следующее списание ${subscription.nextCharge}`;
+}
+
+function isSubscriptionPaid(subscription: SubscriptionItem) {
+  const now = new Date();
+  const currentDay = now.getUTCDate();
+  const currentMonth = now.getUTCMonth() + 1;
+
+  if (subscription.period === "monthly") {
+    return currentDay >= subscription.chargeDay;
+  }
+
+  const chargeMonth = subscription.chargeMonth ?? 1;
+  return currentMonth > chargeMonth || (currentMonth === chargeMonth && currentDay >= subscription.chargeDay);
+}
+
+function paymentBadgeClass(subscription: SubscriptionItem) {
+  return isSubscriptionPaid(subscription) ? "bg-emerald-500/15 text-emerald-300" : "bg-rose-500/15 text-rose-300";
+}
+
+function paymentLabel(subscription: SubscriptionItem) {
+  return isSubscriptionPaid(subscription) ? "Оплачено" : "Не оплачено";
+}
+
+function autoPayBadgeClass(subscription: SubscriptionItem) {
+  return subscription.autoPay ? "bg-cyan-400/15 text-cyan-300" : "bg-amber-500/15 text-amber-300";
+}
+
+function autoPayLabel(subscription: SubscriptionItem) {
+  return subscription.autoPay ? "Автоплатёж" : "Без автоплатежа";
 }
 
 export function Dashboard({ data }: { data: DashboardData }) {
@@ -106,35 +139,100 @@ export function Dashboard({ data }: { data: DashboardData }) {
           </article>
 
           <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-base font-semibold text-white sm:text-lg">Подписки месяца</h2>
-                <p className="text-xs text-slate-400 sm:text-sm">Регулярная нагрузка в текущем периоде</p>
+            <div>
+              <h2 className="text-base font-semibold text-white sm:text-lg">Подписки месяца</h2>
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">Сначала подписки, требующие ручного контроля, затем — автоплатёж</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="inline-flex items-center rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-medium text-cyan-300">
+                  {data.subscriptions.length} подписок в этом месяце
+                </span>
+                <span className="inline-flex items-center rounded-full bg-amber-400/15 px-3 py-1 text-xs font-medium text-amber-200">
+                  {data.manualSubscriptions.length} без автоплатежа
+                </span>
               </div>
-              <span className="shrink-0 rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-medium text-cyan-300">
-                {data.subscriptions.length} шт.
-              </span>
             </div>
-            <ul className="mt-4 space-y-3">
-              {data.subscriptions.map((subscription) => (
-                <li
-                  key={subscription.id}
-                  className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3"
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                    <div className="min-w-0">
-                      <p className="font-medium text-white">{subscription.name}</p>
-                      <p className="text-xs text-slate-400 sm:text-sm">
-                        {subscription.period === "monthly" ? "Ежемесячно" : "Ежегодно"} · следующее списание {subscription.nextCharge}
-                      </p>
+
+            {data.subscriptions.length > 0 ? (
+              <div className="mt-5 space-y-5">
+                {data.manualSubscriptions.length > 0 ? (
+                  <div>
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-sm font-semibold text-white sm:text-base">Требуют внимания</h3>
+                        <p className="text-xs text-amber-50/80 sm:text-sm">Подписки без автоплатежа</p>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium text-cyan-300">
-                      {subscription.amount}
-                    </span>
+                    <ul className="space-y-3">
+                      {data.manualSubscriptions.map((subscription) => (
+                        <li
+                          key={subscription.id}
+                          className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-3"
+                        >
+                          <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                              <div className="min-w-0">
+                                <p className="font-medium text-white">{subscription.name}</p>
+                                <p className="text-xs text-amber-50/80 sm:text-sm">{subscriptionScheduleLabel(subscription)}</p>
+                              </div>
+                              <span className="text-sm font-medium text-amber-200">{subscription.amount}</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${autoPayBadgeClass(subscription)}`}>
+                                {autoPayLabel(subscription)}
+                              </span>
+                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
+                                {paymentLabel(subscription)}
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </li>
-              ))}
-            </ul>
+                ) : null}
+
+                {data.subscriptions.some((subscription) => subscription.autoPay) ? (
+                  <div className={data.manualSubscriptions.length > 0 ? "border-t border-white/10 pt-5" : ""}>
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-sm font-semibold text-white sm:text-base">Автоплатёж</h3>
+                        <p className="text-xs text-slate-400 sm:text-sm">Подписки, которые спишутся автоматически</p>
+                      </div>
+                    </div>
+                    <ul className="space-y-3">
+                      {data.subscriptions.filter((subscription) => subscription.autoPay).map((subscription) => (
+                        <li
+                          key={subscription.id}
+                          className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3"
+                        >
+                          <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                              <div className="min-w-0">
+                                <p className="font-medium text-white">{subscription.name}</p>
+                                <p className="text-xs text-slate-400 sm:text-sm">{subscriptionScheduleLabel(subscription)}</p>
+                              </div>
+                              <span className="text-sm font-medium text-cyan-300">{subscription.amount}</span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${autoPayBadgeClass(subscription)}`}>
+                                {autoPayLabel(subscription)}
+                              </span>
+                              <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
+                                {paymentLabel(subscription)}
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                В этом месяце регулярных подписок нет.
+              </div>
+            )}
           </article>
         </div>
       </section>

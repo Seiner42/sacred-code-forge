@@ -11,6 +11,7 @@ type FormState = {
   status: "active" | "paused";
   chargeDay: string;
   chargeMonth: string;
+  autoPay: boolean;
 };
 
 const periodLabels = { monthly: "Ежемесячно", yearly: "Ежегодно" };
@@ -46,7 +47,7 @@ const actionButtonClass =
 
 function formFromSubscription(subscription?: SubscriptionItem): FormState {
   if (!subscription) {
-    return { name: "", period: "monthly", amount: "", status: "active", chargeDay: "1", chargeMonth: "1" };
+    return { name: "", period: "monthly", amount: "", status: "active", chargeDay: "1", chargeMonth: "1", autoPay: false };
   }
 
   return {
@@ -56,6 +57,7 @@ function formFromSubscription(subscription?: SubscriptionItem): FormState {
     status: subscription.status,
     chargeDay: String(subscription.chargeDay),
     chargeMonth: String(subscription.chargeMonth ?? 1),
+    autoPay: subscription.autoPay,
   };
 }
 
@@ -66,6 +68,14 @@ function nextChargeLabel(subscription: SubscriptionItem) {
 
 function paymentStateClass(subscription: SubscriptionItem) {
   return paymentState(subscription) ? "text-emerald-300" : "text-rose-300";
+}
+
+function autoPayBadgeClass(autoPay: boolean) {
+  return autoPay ? "bg-cyan-400/15 text-cyan-300" : "bg-amber-500/15 text-amber-300";
+}
+
+function autoPayLabel(autoPay: boolean) {
+  return autoPay ? "Автоплатёж" : "Без автоплатежа";
 }
 
 export function SubscriptionsClient({ initialSubscriptions }: { initialSubscriptions: SubscriptionItem[] }) {
@@ -81,6 +91,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
   const activeSubscriptions = useMemo(() => subscriptions.filter((item) => item.status === "active"), [subscriptions]);
   const totalPerMonth = useMemo(() => activeSubscriptions.filter((item) => item.period === "monthly").reduce((sum, item) => sum + item.amountValue, 0), [activeSubscriptions]);
   const totalPerYear = useMemo(() => activeSubscriptions.reduce((sum, item) => sum + (item.period === "monthly" ? item.amountValue * 12 : item.amountValue), 0), [activeSubscriptions]);
+  const manualSubscriptions = useMemo(() => activeSubscriptions.filter((item) => !item.autoPay), [activeSubscriptions]);
 
   function openCreateModal() {
     setEditingId(null);
@@ -117,6 +128,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
         status: form.status,
         chargeDay: Number(form.chargeDay),
         chargeMonth: form.period === "yearly" ? Number(form.chargeMonth) : null,
+        autoPay: form.autoPay,
       };
 
       const response = await fetch(editingId ? `/api/subscriptions/${editingId}` : "/api/subscriptions", {
@@ -164,7 +176,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
   return (
     <>
       <div className="space-y-4 sm:space-y-6">
-        <section className="grid gap-3 lg:grid-cols-5 sm:gap-4">
+        <section className="grid gap-3 lg:grid-cols-6 sm:gap-4">
           <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-6">
             <p className="text-sm text-slate-400">Всего подписок</p>
             <p className="mt-2 text-2xl font-semibold text-white sm:mt-3 sm:text-3xl">{subscriptions.length}</p>
@@ -181,6 +193,12 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
             <p className="text-sm text-slate-400">Ежегодные</p>
             <p className="mt-2 text-2xl font-semibold text-white sm:mt-3 sm:text-3xl">{yearly.length}</p>
             <p className="mt-2 text-xs text-slate-400 sm:text-sm">Списания раз в год</p>
+          </article>
+
+          <article className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 shadow-lg shadow-black/20 sm:p-6">
+            <p className="text-sm text-amber-100/80">Без автоплатежа</p>
+            <p className="mt-2 text-2xl font-semibold text-amber-300 sm:mt-3 sm:text-3xl">{manualSubscriptions.length}</p>
+            <p className="mt-2 text-xs text-amber-50/80 sm:text-sm">Активные подписки, требующие ручного контроля</p>
           </article>
 
           <article className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 shadow-lg shadow-black/20 sm:p-6">
@@ -223,14 +241,17 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                     </div>
                     <span className={`shrink-0 text-sm font-medium ${paymentStateClass(subscription)}`}>{subscription.amount}</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
                       {paymentStateLabel(subscription)}
                     </span>
-                    <div className="flex gap-2">
-                      <button onClick={() => openEditModal(subscription)} className={actionButtonClass} aria-label="Изменить подписку" title="Изменить">✏️</button>
-                      <button onClick={() => handleDelete(subscription)} className={actionButtonClass} aria-label="Удалить подписку" title="Удалить">🗑️</button>
-                    </div>
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${autoPayBadgeClass(subscription.autoPay)}`}>
+                      {autoPayLabel(subscription.autoPay)}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex justify-end gap-2">
+                    <button onClick={() => openEditModal(subscription)} className={actionButtonClass} aria-label="Изменить подписку" title="Изменить">✏️</button>
+                    <button onClick={() => handleDelete(subscription)} className={actionButtonClass} aria-label="Удалить подписку" title="Удалить">🗑️</button>
                   </div>
                 </article>
               ))}
@@ -243,6 +264,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                     <th className="px-4 py-3 font-medium">Название</th>
                     <th className="px-4 py-3 font-medium">Период</th>
                     <th className="px-4 py-3 font-medium">Списание</th>
+                    <th className="px-4 py-3 font-medium">Автоплатёж</th>
                     <th className="px-4 py-3 font-medium">Оплата</th>
                     <th className="px-4 py-3 font-medium text-right">Сумма</th>
                     <th className="px-4 py-3 font-medium text-right">Действия</th>
@@ -254,6 +276,11 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                       <td className="px-4 py-3 font-medium text-white">{subscription.name}</td>
                       <td className="px-4 py-3 text-slate-400">{periodLabels[subscription.period]}</td>
                       <td className="px-4 py-3 text-slate-400">{nextChargeLabel(subscription)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${autoPayBadgeClass(subscription.autoPay)}`}>
+                          {autoPayLabel(subscription.autoPay)}
+                        </span>
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${paymentBadgeClass(subscription)}`}>
                           {paymentStateLabel(subscription)}
@@ -283,7 +310,7 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
               <ul className="mt-4 space-y-3 text-sm text-slate-300">
                 <li className="rounded-xl bg-slate-950/40 px-4 py-3">Добавляй и редактируй подписки вручную</li>
                 <li className="rounded-xl bg-slate-950/40 px-4 py-3">Для годовых списаний указывай день и месяц</li>
-                <li className="rounded-xl bg-slate-950/40 px-4 py-3">Цвет и подпись показывают, прошла ли дата оплаты в текущем цикле</li>
+                <li className="rounded-xl bg-slate-950/40 px-4 py-3">Флаг автоплатежа помогает отделить ручные оплаты от автоматических</li>
               </ul>
             </article>
           </div>
@@ -398,6 +425,19 @@ export function SubscriptionsClient({ initialSubscriptions }: { initialSubscript
                   <option value="active">Активна</option>
                   <option value="paused">На паузе</option>
                 </select>
+              </label>
+
+              <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-slate-200">
+                <input
+                  type="checkbox"
+                  checked={form.autoPay}
+                  onChange={(event) => setForm((current) => ({ ...current, autoPay: event.target.checked }))}
+                  className="mt-1 h-4 w-4 rounded border-white/20 bg-slate-950 text-cyan-400"
+                />
+                <span>
+                  <span className="block font-medium text-white">Автоплатёж</span>
+                  <span className="mt-1 block text-xs text-slate-400">По умолчанию выключен. Включай только там, где списание проходит автоматически.</span>
+                </span>
               </label>
 
               {error ? <div className="rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div> : null}

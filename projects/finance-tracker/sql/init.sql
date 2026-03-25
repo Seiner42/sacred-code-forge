@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   amount REAL NOT NULL,
   category_id TEXT,
   is_active INTEGER NOT NULL DEFAULT 1,
+  auto_pay INTEGER NOT NULL DEFAULT 0,
   notes TEXT,
   charge_day INTEGER,
   charge_month INTEGER,

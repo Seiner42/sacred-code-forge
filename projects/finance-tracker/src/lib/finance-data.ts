@@ -25,19 +25,27 @@ export type SubscriptionItem = {
   chargeDay: number;
   chargeMonth: number | null;
   status: "active" | "paused";
+  autoPay: boolean;
 };
 
 export type SummaryCard = { title: string; value: string; hint: string };
 export type ImportHistoryItem = { id: string; fileName: string; bank: "Альфа" | "Тинькофф"; importedAt: string; rows: number; imported: number; skipped: number; failed: number; needsReview: number; status: "ready" | "processing" | "failed"; };
 export type TopCategoryItem = { name: string; amount: string; icon: string | null };
-export type DashboardData = { monthLabel: string; summaryCards: SummaryCard[]; recentTransactions: OperationItem[]; topCategories: TopCategoryItem[]; subscriptions: SubscriptionItem[]; };
+export type DashboardData = {
+  monthLabel: string;
+  summaryCards: SummaryCard[];
+  recentTransactions: OperationItem[];
+  topCategories: TopCategoryItem[];
+  subscriptions: SubscriptionItem[];
+  manualSubscriptions: SubscriptionItem[];
+};
 export type ReviewItem = { id: string; importId: string; rawMerchant: string; sourceCategory: string | null; mcc: string | null; sampleCount: number; suggestedMerchantNormalized: string; suggestedCategoryId: string | null; };
 export type CategoryOption = { id: string; name: string; slug: string };
 export type CategoryAdminItem = { id: string; name: string; slug: string; color: string | null; icon: string | null; isActive: boolean };
 export type MerchantRuleAdminItem = { id: string; matchType: "exact" | "contains"; pattern: string; merchantNormalized: string; categoryId: string | null; categoryName: string | null; directionOverride: "expense" | "income" | null; priority: number; notes: string | null };
 
 type TransactionRow = { id: string; operation_date: string; merchant_normalized: string; amount: number; direction: "expense" | "income"; description: string | null; category_id: string | null; category_name: string | null; category_color: string | null; category_icon: string | null; source_order: number | null; created_at: string; };
-type SubscriptionRow = { id: string; name: string; period: "monthly" | "yearly"; amount: number; is_active: number; created_at: string; charge_day: number | null; charge_month: number | null; };
+type SubscriptionRow = { id: string; name: string; period: "monthly" | "yearly"; amount: number; is_active: number; auto_pay: number | null; created_at: string; charge_day: number | null; charge_month: number | null; };
 type ImportRow = { id: string; source: "alfa" | "tinkoff"; file_name: string; imported_at: string; rows_count: number; rows_imported: number; rows_skipped: number; rows_needing_review: number; rows_failed: number; status: "ready" | "processing" | "failed"; };
 type ReviewRow = { id: string; import_id: string; raw_merchant: string; source_category: string | null; mcc: string | null; sample_count: number; suggested_merchant_normalized: string | null; suggested_category_id: string | null; };
 type CategoryRow = { id: string; name: string; slug: string; color?: string | null; icon?: string | null; is_active?: number; };
@@ -55,12 +63,12 @@ function nextChargeFromSchedule(period: "monthly" | "yearly", chargeDay: number 
   return `${String(day).padStart(2, "0")}.${String(month).padStart(2, "0")}`;
 }
 function getTransactionRows() { return db.prepare(`SELECT transactions.id, transactions.operation_date, transactions.merchant_normalized, transactions.amount, transactions.direction, transactions.description, transactions.category_id, transactions.source_order, transactions.created_at, categories.name AS category_name, categories.color AS category_color, categories.icon AS category_icon FROM transactions LEFT JOIN categories ON categories.id = transactions.category_id ORDER BY transactions.operation_date DESC, CASE WHEN transactions.source_order IS NULL THEN 1 ELSE 0 END ASC, transactions.source_order ASC, transactions.created_at DESC`).all() as TransactionRow[]; }
-function getSubscriptionRows() { return db.prepare(`SELECT id, name, period, amount, is_active, created_at, charge_day, charge_month FROM subscriptions ORDER BY is_active DESC, amount DESC, name ASC`).all() as SubscriptionRow[]; }
+function getSubscriptionRows() { return db.prepare(`SELECT id, name, period, amount, is_active, auto_pay, created_at, charge_day, charge_month FROM subscriptions ORDER BY is_active DESC, amount DESC, name ASC`).all() as SubscriptionRow[]; }
 function getImportRows() { return db.prepare(`SELECT id, source, file_name, imported_at, rows_count, rows_imported, rows_skipped, rows_needing_review, rows_failed, status FROM imports ORDER BY imported_at DESC, created_at DESC`).all() as ImportRow[]; }
 function getReviewRows() { return db.prepare(`SELECT id, import_id, raw_merchant, source_category, mcc, sample_count, suggested_merchant_normalized, suggested_category_id FROM import_review_items WHERE status = 'pending' ORDER BY sample_count DESC, raw_merchant ASC`).all() as ReviewRow[]; }
 function getMerchantRuleRows() { return db.prepare(`SELECT merchant_rules.id, merchant_rules.match_type, merchant_rules.pattern, merchant_rules.merchant_normalized, merchant_rules.category_id, categories.name AS category_name, merchant_rules.direction_override, merchant_rules.priority, merchant_rules.notes FROM merchant_rules LEFT JOIN categories ON categories.id = merchant_rules.category_id ORDER BY merchant_rules.priority DESC, merchant_rules.pattern ASC`).all() as MerchantRuleRow[]; }
 function toOperationItem(row: TransactionRow): OperationItem { return { id: row.id, date: formatDate(row.operation_date), merchant: row.merchant_normalized, category: row.category_name ?? "Без категории", categoryId: row.category_id, categoryColor: row.category_color ?? null, categoryIcon: row.category_icon ?? null, amount: formatCurrency(row.amount, { sign: row.direction === "income" }), amountValue: row.amount, type: row.direction, description: row.description, status: "done" }; }
-function toSubscriptionItem(row: SubscriptionRow): SubscriptionItem { return { id: row.id, name: row.name, period: row.period, amount: formatCurrency(row.amount), amountValue: row.amount, nextCharge: nextChargeFromSchedule(row.period, row.charge_day, row.charge_month, row.created_at), chargeDay: row.charge_day ?? new Date(row.created_at).getUTCDate(), chargeMonth: row.period === "yearly" ? (row.charge_month ?? (new Date(row.created_at).getUTCMonth() + 1)) : null, status: row.is_active ? "active" : "paused" }; }
+function toSubscriptionItem(row: SubscriptionRow): SubscriptionItem { return { id: row.id, name: row.name, period: row.period, amount: formatCurrency(row.amount), amountValue: row.amount, nextCharge: nextChargeFromSchedule(row.period, row.charge_day, row.charge_month, row.created_at), chargeDay: row.charge_day ?? new Date(row.created_at).getUTCDate(), chargeMonth: row.period === "yearly" ? (row.charge_month ?? (new Date(row.created_at).getUTCMonth() + 1)) : null, status: row.is_active ? "active" : "paused", autoPay: Boolean(row.auto_pay) }; }
 function toImportItem(row: ImportRow): ImportHistoryItem { return { id: row.id, fileName: row.file_name, bank: row.source === "alfa" ? "Альфа" : "Тинькофф", importedAt: `${formatDate(row.imported_at.slice(0, 10))} ${row.imported_at.slice(11, 16)}`, rows: row.rows_count, imported: row.rows_imported, skipped: row.rows_skipped, failed: row.rows_failed, needsReview: row.rows_needing_review, status: row.status }; }
 export function getOperations() { return getTransactionRows().map(toOperationItem); }
 export function getSubscriptions() { return getSubscriptionRows().map(toSubscriptionItem); }
@@ -105,6 +113,12 @@ export function getDashboardData(): DashboardData {
     .slice(0, 4)
     .map(([name, value]) => ({ name, amount: formatCurrency(value.amount), icon: value.icon }));
 
+  const manualSubscriptions = subscriptionItems
+    .filter((item) => item.status === "active" && !item.autoPay)
+    .filter((item) => item.period === "monthly" || item.chargeMonth === currentMonthNumber)
+    .sort((a, b) => a.chargeDay - b.chargeDay || a.name.localeCompare(b.name))
+    .slice(0, 5);
+
   return {
     monthLabel: monthLabelFromIso(currentMonthKey),
     summaryCards: [
@@ -131,6 +145,11 @@ export function getDashboardData(): DashboardData {
     ],
     recentTransactions: currentMonthTransactions.slice(0, 5).map(toOperationItem),
     topCategories: topCategoriesItems,
-    subscriptions: subscriptionItems.slice(0, 3),
+    subscriptions: subscriptionItems
+      .filter((item) => item.status === "active")
+      .filter((item) => item.period === "monthly" || item.chargeMonth === currentMonthNumber)
+      .sort((a, b) => a.chargeDay - b.chargeDay || a.name.localeCompare(b.name))
+      .slice(0, 5),
+    manualSubscriptions,
   };
 }

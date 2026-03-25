@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 const navItems = [
   { href: "/", label: "Обзор" },
   { href: "/operations", label: "Операции" },
+  { href: "/statistics", label: "Статистика" },
   { href: "/subscriptions", label: "Подписки" },
   { href: "/imports", label: "Импорт" },
   { href: "/review", label: "Разбор" },

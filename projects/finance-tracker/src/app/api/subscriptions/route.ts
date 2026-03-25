@@ -10,6 +10,7 @@ type Payload = {
   status?: "active" | "paused";
   chargeDay?: number;
   chargeMonth?: number | null;
+  autoPay?: boolean;
 };
 
 function validatePayload(payload: Payload) {
@@ -19,6 +20,7 @@ function validatePayload(payload: Payload) {
   if (payload.status !== "active" && payload.status !== "paused") return "Некорректный статус";
   if (typeof payload.chargeDay !== "number" || Number.isNaN(payload.chargeDay) || payload.chargeDay < 1 || payload.chargeDay > 31) return "Некорректный день списания";
   if (payload.period === "yearly" && (typeof payload.chargeMonth !== "number" || Number.isNaN(payload.chargeMonth) || payload.chargeMonth < 1 || payload.chargeMonth > 12)) return "Некорректный месяц списания";
+  if (typeof payload.autoPay !== "boolean") return "Некорректное значение автоплатежа";
   return null;
 }
 
@@ -37,7 +39,8 @@ function ensureSubscriptionCategory() {
 
 export async function POST(request: Request) {
   const payload = (await request.json()) as Payload;
-  const error = validatePayload(payload);
+  const normalizedPayload = { ...payload, autoPay: payload.autoPay ?? false } satisfies Payload;
+  const error = validatePayload(normalizedPayload);
   if (error) return NextResponse.json({ ok: false, error }, { status: 400 });
 
   const id = `sub_${randomUUID()}`;
@@ -45,9 +48,9 @@ export async function POST(request: Request) {
   const categoryId = ensureSubscriptionCategory();
 
   db.prepare(`
-    INSERT INTO subscriptions (id, name, period, amount, category_id, is_active, notes, charge_day, charge_month, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?)
-  `).run(id, payload.name!.trim(), payload.period!, payload.amount!, categoryId, payload.status === "active" ? 1 : 0, payload.chargeDay!, payload.period === "yearly" ? payload.chargeMonth! : null, now, now);
+    INSERT INTO subscriptions (id, name, period, amount, category_id, is_active, auto_pay, notes, charge_day, charge_month, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?)
+  `).run(id, normalizedPayload.name!.trim(), normalizedPayload.period!, normalizedPayload.amount!, categoryId, normalizedPayload.status === "active" ? 1 : 0, normalizedPayload.autoPay ? 1 : 0, normalizedPayload.chargeDay!, normalizedPayload.period === "yearly" ? normalizedPayload.chargeMonth! : null, now, now);
 
   const subscription = getSubscriptions().find((item) => item.id === id);
   return NextResponse.json({ ok: true, subscription });
