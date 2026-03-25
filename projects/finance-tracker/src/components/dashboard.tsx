@@ -70,7 +70,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
         ))}
       </section>
 
-      <section className="grid items-start gap-4 xl:grid-cols-[1.4fr_1fr] sm:gap-6">
+      <section className="grid gap-4 xl:grid-cols-[1.4fr_1fr] sm:gap-6">
         <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
           <div className="mb-4">
             <h2 className="text-base font-semibold text-white sm:text-lg">Последние операции месяца</h2>
@@ -117,9 +117,12 @@ export function Dashboard({ data }: { data: DashboardData }) {
           </div>
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
-          <h2 className="text-base font-semibold text-white sm:text-lg">Топ категорий месяца</h2>
-          <ul className="mt-4 space-y-3">
+        <article className="h-full rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-black/20 sm:p-5">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold text-white sm:text-lg">Топ категорий месяца</h2>
+            <p className="text-xs text-slate-400 sm:text-sm">Крупнейшие категории расходов за текущий месяц</p>
+          </div>
+          <ul className="space-y-3">
             {data.topCategories.map((category, index) => (
               <li
                 key={category.name}

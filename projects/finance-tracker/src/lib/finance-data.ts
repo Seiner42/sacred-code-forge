@@ -142,7 +142,7 @@ export function getDashboardData(): DashboardData {
         hint: subscriptionItems.length > 0 ? "Ежемесячные + годовые, если месяц оплаты совпал" : "Пока подписок нет",
       },
     ],
-    recentTransactions: currentMonthTransactions.slice(0, 5).map(toOperationItem),
+    recentTransactions: currentMonthTransactions.slice(0, 6).map(toOperationItem),
     topCategories: topCategoriesItems,
     subscriptions: subscriptionItems
       .filter((item) => item.status === "active")
